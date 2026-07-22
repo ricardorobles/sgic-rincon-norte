@@ -1134,9 +1134,10 @@
             );
         }
 
-        window.onload = function() {
+window.onload = function() {
             lucide.createIcons();
             
+            // Carga rápida inicial desde la caché (localStorage) para no dejar la pantalla vacía
             const localData = localStorage.getItem("SGIC_incidencias");
             if (localData) {
                 incidencias = JSON.parse(localData);
@@ -1160,7 +1161,10 @@
             renderStatsCharts();
             updateQuickStats();
 
-            // ✅ Intentar obtener ubicación automáticamente después de cargar el mapa
+            // ✅ LLAMADA A LA NUBE PARA TRAER LOS DATOS REALES DE GOOGLE SHEETS
+            cargarIncidenciasDesdeNube();
+
+            // Intentar obtener ubicación automáticamente después de cargar el mapa
             setTimeout(obtenerUbicacionUsuario, 500);
         };
 
@@ -2062,6 +2066,35 @@
                     }
                 });
             }
+        }
+
+        // ==============================================
+        // ☁️ FUNCIÓN PARA LEER DATOS DESDE GOOGLE SHEETS
+        // ==============================================
+        function cargarIncidenciasDesdeNube() {
+            // URL de la aplicación web de Google Apps Script
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbwYQEZiFSFK5LZhV2L2QlPndAwSntCzluuK3ulCcQuCHg3wW2y5qoBMtQe8V5l55F7W/exec";
+            
+            fetch(webAppUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    incidencias = data.data; // Reemplazamos la base local con la de la nube
+                    localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias)); // Actualizamos caché
+                    
+                    // Refrescamos toda la interfaz del administrador y vecinos
+                    renderRecentVecinoList();
+                    renderExpedientesTable();
+                    renderAdminMarkers();
+                    renderStatsCharts();
+                    updateQuickStats();
+                    
+                    console.log("✅ Datos sincronizados correctamente desde Google Sheets.");
+                } else {
+                    console.error("Error al leer desde la nube:", data.message);
+                }
+            })
+            .catch(error => console.error("Error de conexión al leer datos:", error));
         }
 
         function showAlert(message, type = "success") {
