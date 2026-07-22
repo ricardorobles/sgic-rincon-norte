@@ -1452,9 +1452,14 @@ window.onload = function() {
             const nextIndex = incidencias.length + 1;
             const customId = `HN-2026-${String(nextIndex).padStart(4, '0')}`;
 
+            // Generar fecha y hora actual exacta
+            const ahora = new Date();
+            const fechaHoraExacta = ahora.toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
             const nuevaIncidencia = {
                 id: customId,
                 fecha: fecha,
+                horaRegistro: fechaHoraExacta, // 🕒 Se añade la marca de tiempo exacta aquí
                 direccion: direccion,
                 lat: parseFloat(latVal),
                 lng: parseFloat(lngVal),
