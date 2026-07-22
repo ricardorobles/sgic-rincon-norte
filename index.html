@@ -1319,6 +1319,9 @@ window.onload = function() {
             adminMarkersGroup.clearLayers();
             
             incidencias.forEach(inc => {
+                // Si la incidencia no tiene coordenadas válidas, la saltamos para que no rompa el mapa
+                if (!inc.lat || !inc.lng || isNaN(inc.lat) || isNaN(inc.lng)) return;
+
                 let color = '#2e9d36';
                 if (inc.prioridad === 'Crítica') color = '#e11d48';
                 else if (inc.prioridad === 'Alta') color = '#f97316';
@@ -1348,6 +1351,7 @@ window.onload = function() {
             });
         }
 
+        
         function updateSubcategories(categoria) {
             const subSection = document.getElementById("subcategories-section");
             const subTitle = document.getElementById("subcategories-title");
