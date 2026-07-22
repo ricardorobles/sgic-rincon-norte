@@ -1730,7 +1730,7 @@ window.onload = function() {
             renderExpedientesTable();
         }
 
-        function openFicha(id) {
+function openFicha(id) {
             const inc = incidencias.find(i => i.id === id);
             if (!inc) return;
 
@@ -1745,6 +1745,8 @@ window.onload = function() {
             document.getElementById("ficha-coordenadas").innerText = `${inc.lat.toFixed(7)}, ${inc.lng.toFixed(7)}`;
             document.getElementById("ficha-descripcion").innerText = inc.comentario || "Sin comentarios o descripción detallada.";
             document.getElementById("ficha-observaciones").value = inc.observaciones || "";
+            
+            // Asignar la URL de la imagen (ya formateada como https://lh3.googleusercontent.com/d/[ID])
             document.getElementById("ficha-imagen-evidencia").src = inc.foto;
 
             renderFichaActuaciones(inc.actuaciones);
