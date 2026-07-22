@@ -1825,24 +1825,59 @@ window.onload = function() {
             showAlert("¡Actuación incorporada al expediente!", "success");
         }
 
-        function saveFichaChanges() {
+function saveFichaChanges() {
             const inc = incidencias.find(i => i.id === activeFichaId);
             if (!inc) return;
 
+            // Capturar los nuevos valores del panel de administración
             inc.estado = document.getElementById("ficha-select-estado").value;
             inc.prioridad = document.getElementById("ficha-select-prioridad").value;
             inc.observaciones = document.getElementById("ficha-observaciones").value;
 
+            // Guardar localmente
             localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
-            closeModal();
-            showAlert(`Se guardaron los cambios para el Expediente ${inc.id}`, "success");
-            
-            renderRecentVecinoList();
-            renderExpedientesTable();
-            renderAdminMarkers();
-            renderStatsCharts();
-            updateQuickStats();
+            showAlert(`⏳ Actualizando registro en Google Sheets...`, "success");
+
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbwYQEZiFSFK5LZhV2L2QlPndAwSntCzluuK3ulCcQuCHg3wW2y5qoBMtQe8V5l55F7W/exec";
+
+            // Enviar los cambios a la nube mediante fetch
+            const payload = {
+                action: "update",
+                id: inc.id,
+                estado: inc.estado,
+                prioridad: inc.prioridad,
+                observaciones: inc.observaciones
+            };
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.status === "success") {
+                        closeModal();
+                        showAlert(`✅ ¡Expediente ${inc.id} actualizado con éxito en la nube!`, "success");
+                        
+                        renderRecentVecinoList();
+                        renderExpedientesTable();
+                        renderAdminMarkers();
+                        renderStatsCharts();
+                        updateQuickStats();
+                    } else {
+                        showAlert(`⚠️ Error al actualizar en la nube: ${data.message}`, "error");
+                    }
+                } catch (e) {
+                    showAlert(`⚠️ Error de respuesta al sincronizar.`, "error");
+                }
+            })
+            .catch(error => {
+                showAlert(`⚠️ Error de red al intentar actualizar.`, "error");
+            });
         }
 
         function viewAttachedDoc(docName) {
