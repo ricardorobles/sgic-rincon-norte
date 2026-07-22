@@ -1792,7 +1792,7 @@ window.onload = function() {
             el.classList.toggle("hidden");
         }
 
-        function addActuacion() {
+function addActuacion() {
             const accion = document.getElementById("actuacion-accion").value;
             const autor = document.getElementById("actuacion-autor").value;
             const detalles = document.getElementById("actuacion-detalles").value;
@@ -1807,22 +1807,56 @@ window.onload = function() {
 
             const hoy = new Date().toISOString().split('T')[0];
             const nuevaAct = {
+                id: inc.id,
                 fecha: hoy,
                 accion: accion,
                 autor: autor,
                 detalles: detalles
             };
 
-            inc.actuaciones.push(nuevaAct);
-            localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
+            showAlert(`⏳ Registrando actuación en la nube...`, "success");
 
-            document.getElementById("actuacion-accion").value = '';
-            document.getElementById("actuacion-autor").value = '';
-            document.getElementById("actuacion-detalles").value = '';
-            document.getElementById("form-actuacion-container").classList.add("hidden");
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbwYQEZiFSFK5LZhV2L2QlPndAwSntCzluuK3ulCcQuCHg3wW2y5qoBMtQe8V5l55F7W/exec";
 
-            renderFichaActuaciones(inc.actuaciones);
-            showAlert("¡Actuación incorporada al expediente!", "success");
+            const payload = {
+                action: "addActuacion",
+                id: nuevaAct.id,
+                fecha: nuevaAct.fecha,
+                accion: nuevaAct.accion,
+                autor: nuevaAct.autor,
+                detalles: nuevaAct.detalles
+            };
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.status === "success") {
+                        inc.actuaciones.push(nuevaAct);
+                        localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
+
+                        document.getElementById("actuacion-accion").value = '';
+                        document.getElementById("actuacion-autor").value = '';
+                        document.getElementById("actuacion-detalles").value = '';
+                        document.getElementById("form-actuacion-container").classList.add("hidden");
+
+                        renderFichaActuaciones(inc.actuaciones);
+                        showAlert("¡Actuación incorporada y guardada en Google Sheets!", "success");
+                    } else {
+                        showAlert(`⚠️ Error al guardar actuación: ${data.message}`, "error");
+                    }
+                } catch (e) {
+                    showAlert(`⚠️ Error al procesar respuesta del servidor.`, "error");
+                }
+            })
+            .catch(error => {
+                showAlert(`⚠️ Error de red al intentar guardar la actuación.`, "error");
+            });
         }
 
 function saveFichaChanges() {
