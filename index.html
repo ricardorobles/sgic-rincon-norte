@@ -938,8 +938,10 @@
     <!-- SCRIPT DEL SISTEMA (CON COMPRESIÓN DE IMÁGENES) -->
     <!-- ============================================== -->
     <script>
-        const RINCON_NORTE_COORDS = [-31.58172, -60.54317];
+
         
+        const RINCON_NORTE_COORDS = [-31.58172, -60.54317];
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbwexKJNUQHtIuDFgmRmG8beO8pBICdW_FOgQ1cXllVmdfXUuIfo4-3_51exO-j0eoe2/exec";
         let incidencias = [];
         let mapVecino, mapAdmin;
         let vecinoMarker, adminMarkersGroup;
@@ -1478,8 +1480,6 @@ window.onload = function() {
 
             showAlert(`⏳ Guardando incidencia en la nube...`, "success");
 
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbwexKJNUQHtIuDFgmRmG8beO8pBICdW_FOgQ1cXllVmdfXUuIfo4-3_51exO-j0eoe2/exec";
-
             // Enviar datos mediante fetch forzando petición simple
             fetch(webAppUrl, {
                 method: 'POST',
@@ -1827,8 +1827,6 @@ function addActuacion() {
 
             showAlert(`⏳ Registrando actuación en la nube...`, "success");
 
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbwexKJNUQHtIuDFgmRmG8beO8pBICdW_FOgQ1cXllVmdfXUuIfo4-3_51exO-j0eoe2/exec";
-
             const payload = {
                 action: "addActuacion",
                 id: nuevaAct.id,
@@ -1883,8 +1881,6 @@ function saveFichaChanges() {
             localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
             showAlert(`⏳ Actualizando registro en Google Sheets...`, "success");
-
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbwYQEZiFSFK5LZhV2L2QlPndAwSntCzluuK3ulCcQuCHg3wW2y5qoBMtQe8V5l55F7W/exec";
 
             // Enviar los cambios a la nube mediante fetch
             const payload = {
@@ -2152,8 +2148,6 @@ function saveFichaChanges() {
         // ☁️ FUNCIÓN PARA LEER DATOS DESDE GOOGLE SHEETS
         // ==============================================
         function cargarIncidenciasDesdeNube() {
-            // URL de la aplicación web de Google Apps Script
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbwYQEZiFSFK5LZhV2L2QlPndAwSntCzluuK3ulCcQuCHg3wW2y5qoBMtQe8V5l55F7W/exec";
             
             fetch(webAppUrl)
             .then(response => response.json())
