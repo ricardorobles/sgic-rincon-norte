@@ -1493,7 +1493,7 @@ window.onload = function() {
                         incidencias.unshift(nuevaIncidencia);
                         localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
-                        showAlert(`✅ ¡Incidencia registrada con éxito! Código: ${customId}`, "success");
+                        showAlert(`✅ ¡Incidencia registrada con éxito! Código: ${data.id}`, "success");
 
                         setTimeout(function() {
                             document.getElementById("form-incidencia").reset();
@@ -1528,7 +1528,7 @@ window.onload = function() {
                         showAlert("⚠️ Error al guardar: " + data.message, "error");
                     }
                 } catch (e) {
-                    console.error("Google no devolvió JSON válido. Respuesta del servidor:", text);
+                    console.error("Google no devolvió JSON válido. Respuesta del servidor:", text, "| Error real:", e); // 👈 agregá esto
                     showAlert("⚠️ La conexión falló por permisos en Google. Presiona F12 y revisa la consola.", "error");
                 }
             })
