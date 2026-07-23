@@ -214,8 +214,9 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
 
-               /* ========================================================== */
+        /* ========================================================== */
         /* ======= BOTÓN DE LAYERS COMPACTO Y RECTANGULAR ======= */
         /* ========================================================== */
 
@@ -396,7 +397,6 @@
 
         .leaflet-marker-icon.custom-vecino-pin:hover {
             transform: scale(1.1);
-        }
         }
     </style>
 </head>
@@ -1764,12 +1764,6 @@ window.onload = function() {
                 if (precision) precision.innerText = "Ubicación seleccionada manualmente.";
                 colocarMarcadorVecino(e.latlng.lat, e.latlng.lng, true);
             });
-        }
-
-        function updateVecinoCoordenadas(lat, lng) {
-            document.getElementById("vecino-lat").value = lat;
-            document.getElementById("vecino-lng").value = lng;
-            document.getElementById("coordenadas-display").innerText = `${lat}, ${lng}`;
         }
 
         function updateVecinoCoordenadas(lat, lng) {
