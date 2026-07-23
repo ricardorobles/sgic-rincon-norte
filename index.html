@@ -1089,52 +1089,71 @@
         // 📍 GEOLOCALIZACIÓN AUTOMÁTICA
         // ==============================================
 
-        function obtenerUbicacionUsuario() {
-            if (!navigator.geolocation) {
-                console.log("Geolocalización no soportada por el navegador");
-                document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
-                return;
-            }
+function obtenerUbicacionUsuario() {
+    if (!navigator.geolocation) {
+        console.log("Geolocalización no soportada por el navegador");
+        document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
+        return;
+    }
 
-            navigator.geolocation.getCurrentPosition(
-                function(posicion) {
-                    const lat = posicion.coords.latitude;
-                    const lng = posicion.coords.longitude;
-                    console.log("📍 Ubicación obtenida:", lat, lng);
-                    
-                    // Mover el mapa a la ubicación del usuario
-                    mapVecino.setView([lat, lng], 16);
-                    
-                    // Crear o mover el marcador
-                    if (vecinoMarker) {
-                        vecinoMarker.setLatLng([lat, lng]);
-                    } else {
-                        vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
-                        vecinoMarker.on('dragend', function() {
-                            const newLat = vecinoMarker.getLatLng().lat.toFixed(7);
-                            const newLng = vecinoMarker.getLatLng().lng.toFixed(7);
-                            updateVecinoCoordenadas(newLat, newLng);
-                        });
-                    }
-                    
-                    updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
-                },
-                function(error) {
-                    console.warn("⚠️ Error al obtener ubicación:", error.message);
-                    document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
-                    
-                    // Si hay error, mostrar un mensaje amigable
-                    if (error.code === 1) {
-                        showAlert("ℹ️ Para mejor precisión, permita el acceso a la ubicación en su navegador. Puede tocar el mapa para seleccionar manualmente.", "success");
-                    }
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                }
-            );
+    navigator.geolocation.getCurrentPosition(
+        function(posicion) {
+            const lat = posicion.coords.latitude;
+            const lng = posicion.coords.longitude;
+            console.log("📍 Ubicación obtenida:", lat, lng);
+            
+            mapVecino.setView([lat, lng], 16);
+            
+            if (vecinoMarker) {
+                vecinoMarker.setLatLng([lat, lng]);
+            } else {
+                vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
+                vecinoMarker.on('dragend', function() {
+                    const newLat = vecinoMarker.getLatLng().lat.toFixed(7);
+                    const newLng = vecinoMarker.getLatLng().lng.toFixed(7);
+                    updateVecinoCoordenadas(newLat, newLng);
+                });
+            }
+            
+            updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
+        },
+        function(error) {
+            console.warn("⚠️ Error al obtener ubicación:", error.message);
+            document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
+
+            if (error.code === 1) {
+                showAlert("ℹ️ Para mejor precisión, permita el acceso a la ubicación en su navegador. Puede tocar el mapa para seleccionar manualmente.", "success");
+            } else if (error.code === 2) {
+                // 👈 Nuevo: reintenta con menor precisión antes de rendirse
+                console.log("Ubicación no disponible con alta precisión, reintentando...");
+                navigator.geolocation.getCurrentPosition(
+                    function(posicion) {
+                        const lat = posicion.coords.latitude;
+                        const lng = posicion.coords.longitude;
+                        mapVecino.setView([lat, lng], 16);
+                        if (vecinoMarker) {
+                            vecinoMarker.setLatLng([lat, lng]);
+                        } else {
+                            vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
+                        }
+                        updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
+                    },
+                    function() {
+                        showAlert("ℹ️ No pudimos detectar tu ubicación automáticamente. Tocá el mapa para marcar el punto manualmente.", "success");
+                    },
+                    { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+                );
+            } else if (error.code === 3) {
+                showAlert("ℹ️ La ubicación tardó demasiado en responder. Tocá el mapa para marcar el punto manualmente.", "success");
+            }
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
         }
+    );
+}
 
 window.onload = function() {
             lucide.createIcons();
