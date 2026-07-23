@@ -1451,15 +1451,11 @@ window.onload = function() {
             const fotoBase64 = document.getElementById("vecino-foto-base64").value;
             const autoFoto = fotoBase64 || "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=400&q=80";
 
-            const nextIndex = incidencias.length + 1;
-            const customId = `HN-2026-${String(nextIndex).padStart(4, '0')}`;
-
             // Generar fecha y hora actual exacta
             const ahora = new Date();
             const fechaHoraExacta = ahora.toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
 
             const nuevaIncidencia = {
-                id: customId,
                 fecha: fecha,
                 horaRegistro: fechaHoraExacta, // 🕒 Se añade la marca de tiempo exacta aquí
                 direccion: direccion,
@@ -1492,7 +1488,8 @@ window.onload = function() {
             .then(text => {
                 try {
                     const data = JSON.parse(text);
-                    if (data.status === "success") {
+                    if (data.status === "success") 
+                        nuevaIncidencia.id = data.id;
                         incidencias.unshift(nuevaIncidencia);
                         localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
