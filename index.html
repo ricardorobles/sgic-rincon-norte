@@ -19,6 +19,13 @@
     
     <script>
         tailwind.config = {
+            safelist: [
+                'border-brand-green',
+                'bg-brand-green/10',
+                'ring-1',
+                'ring-brand-green/20',
+                'text-brand-green'
+            ],
             theme: {
                 extend: {
                     colors: {
@@ -1151,7 +1158,7 @@
         
         let incidencias = [];
         let mapVecino, mapAdmin;
-        let vecinoMarker, adminMarkersGroup;
+        let vecinoMarker, adminMarkersGroup, vecinoAccuracyCircle;
         let activeFichaId = null;
 
         const MASTER_ADMIN_KEY = "ADMIN_DER#1";
