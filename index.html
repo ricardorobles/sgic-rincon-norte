@@ -1117,41 +1117,37 @@ function obtenerUbicacionUsuario() {
             
             updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
         },
-        function(error) {
-            console.warn("⚠️ Error al obtener ubicación:", error.message);
-            document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
-
-            if (error.code === 1) {
-                showAlert("ℹ️ Para mejor precisión, permita el acceso a la ubicación en su navegador. Puede tocar el mapa para seleccionar manualmente.", "success");
-            } else if (error.code === 2) {
-                // 👈 Nuevo: reintenta con menor precisión antes de rendirse
-                console.log("Ubicación no disponible con alta precisión, reintentando...");
-                navigator.geolocation.getCurrentPosition(
-                    function(posicion) {
-                        const lat = posicion.coords.latitude;
-                        const lng = posicion.coords.longitude;
-                        mapVecino.setView([lat, lng], 16);
-                        if (vecinoMarker) {
-                            vecinoMarker.setLatLng([lat, lng]);
-                        } else {
-                            vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
-                        }
-                        updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
-                    },
-                    function() {
-                        showAlert("ℹ️ No pudimos detectar tu ubicación automáticamente. Tocá el mapa para marcar el punto manualmente.", "success");
-                    },
-                    { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
-                );
-            } else if (error.code === 3) {
-                showAlert("ℹ️ La ubicación tardó demasiado en responder. Tocá el mapa para marcar el punto manualmente.", "success");
-            }
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
-        }
+function(error) {
+    console.warn("⚠️ Error al obtener ubicación:", error.message);
+    document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
+    
+    if (error.code === 2) {
+        // Reintenta con menor precisión antes de rendirse (sin molestar al usuario)
+        console.log("Ubicación no disponible con alta precisión, reintentando...");
+        navigator.geolocation.getCurrentPosition(
+            function(posicion) {
+                const lat = posicion.coords.latitude;
+                const lng = posicion.coords.longitude;
+                mapVecino.setView([lat, lng], 16);
+                if (vecinoMarker) {
+                    vecinoMarker.setLatLng([lat, lng]);
+                } else {
+                    vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
+                }
+                updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
+            },
+            function() {
+                console.log("No se pudo detectar ubicación ni con baja precisión. El usuario puede marcar manualmente.");
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+        );
+    }
+},
+{
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 60000
+}
     );
 }
 
