@@ -1488,7 +1488,7 @@ window.onload = function() {
             .then(text => {
                 try {
                     const data = JSON.parse(text);
-                    if (data.status === "success") 
+                    if (data.status === "success") {
                         nuevaIncidencia.id = data.id;
                         incidencias.unshift(nuevaIncidencia);
                         localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
