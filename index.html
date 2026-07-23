@@ -214,6 +214,189 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+
+               /* ========================================================== */
+        /* ======= BOTÓN DE LAYERS COMPACTO Y RECTANGULAR ======= */
+        /* ========================================================== */
+
+        /* Contenedor principal del botón - se ajusta al contenido */
+        .leaflet-control-layers-vecino {
+            border: 2px solid #2e9d36 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 10px rgba(46, 157, 54, 0.3) !important;
+            background: white !important;
+            font-size: 13px !important;
+            /* 👇 IMPORTANTE: Se ajusta al contenido */
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            font-weight: 600 !important;
+            padding: 0 !important;
+            display: inline-block !important;
+        }
+
+        /* Botón desplegable (icono de capas) */
+        .leaflet-control-layers-vecino .leaflet-control-layers-toggle {
+            width: 34px !important;
+            height: 34px !important;
+            background-color: #2e9d36 !important;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') !important;
+            background-size: 20px 20px !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            border-radius: 8px !important;
+            border: 2px solid #1c6622 !important;
+            margin: 2px !important;
+        }
+
+        .leaflet-control-layers-vecino .leaflet-control-layers-toggle:hover {
+            background-color: #1c6622 !important;
+            transform: scale(1.05);
+            transition: all 0.2s;
+        }
+
+        /* Contenido expandido del botón - SIN ESPACIO EXTRA */
+        .leaflet-control-layers-vecino .leaflet-control-layers-expanded {
+            padding: 4px 8px !important;   /* 👈 Reducido para eliminar espacio extra */
+            font-weight: 700 !important;
+            color: #1c6622 !important;
+            font-size: 12px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            /* 👇 Asegura que el contenido determine el ancho */
+            width: auto !important;
+            min-width: 0 !important;
+        }
+
+        /* Checkboxes / radios - más pequeños y compactos */
+        .leaflet-control-layers-vecino .leaflet-control-layers-selector {
+            width: 14px !important;
+            height: 14px !important;
+            accent-color: #2e9d36 !important;
+            margin-right: 2px !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Cada opción (MAPA / SATÉLITE) - SIN ESPACIO EXTRA */
+        .leaflet-control-layers-vecino label {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            padding: 2px 4px !important;   /* 👈 Mínimo espacio */
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;           /* 👈 Espacio mínimo entre elementos */
+            border-radius: 4px !important;
+            transition: all 0.2s !important;
+            color: #1c6622 !important;
+            white-space: nowrap !important;
+            /* 👇 Asegura que el ancho sea solo el necesario */
+            width: auto !important;
+            min-width: 0 !important;
+        }
+
+        .leaflet-control-layers-vecino label:hover {
+            background-color: #f2fbf3 !important;
+            padding: 2px 6px !important;
+        }
+
+        .leaflet-control-layers-vecino label input[type="radio"] {
+            margin-right: 2px !important;
+        }
+
+        /* Icono verde circular - más pequeño */
+        .layer-icon-vecino {
+            display: inline-block;
+            width: 12px !important;
+            height: 12px !important;
+            background: #2e9d36;
+            border-radius: 50%;
+            border: 2px solid #1c6622;
+            box-shadow: 0 1px 4px rgba(46, 157, 54, 0.4);
+            flex-shrink: 0;
+        }
+
+        /* ======= MAPA MÁS GRANDE EN CELULAR ======= */
+        @media (max-width: 640px) {
+            #map-vecino {
+                height: 420px !important;
+                min-height: 380px !important;
+            }
+            
+            #map-admin {
+                height: 350px !important;
+            }
+
+            .leaflet-control-layers-vecino {
+                font-size: 11px !important;
+            }
+            
+            .leaflet-control-layers-vecino .leaflet-control-layers-toggle {
+                width: 30px !important;
+                height: 30px !important;
+                background-size: 16px 16px !important;
+            }
+            
+            .leaflet-control-layers-vecino label {
+                font-size: 10px !important;
+                padding: 1px 3px !important;
+                gap: 3px !important;
+            }
+            
+            .leaflet-control-layers-vecino .leaflet-control-layers-expanded {
+                padding: 3px 6px !important;
+                font-size: 10px !important;
+            }
+            
+            .leaflet-control-layers-vecino .leaflet-control-layers-selector {
+                width: 12px !important;
+                height: 12px !important;
+            }
+            
+            .layer-icon-vecino {
+                width: 10px !important;
+                height: 10px !important;
+            }
+        }
+
+        /* Para tablets */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #map-vecino {
+                height: 480px !important;
+            }
+        }
+
+        /* ======= ANIMACIÓN DEL PIN VERDE ======= */
+        @keyframes pulse-green {
+            0% {
+                transform: translateX(-50%) scale(0.8);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateX(-50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) scale(0.8);
+                opacity: 0.7;
+            }
+        }
+
+        /* Estilo adicional para el pin en el mapa */
+        .custom-vecino-pin {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .leaflet-marker-icon.custom-vecino-pin {
+            filter: drop-shadow(0 4px 12px rgba(46, 157, 54, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .leaflet-marker-icon.custom-vecino-pin:hover {
+            transform: scale(1.1);
+        }
         }
     </style>
 </head>
@@ -288,26 +471,52 @@
                 <form id="form-incidencia" onsubmit="saveIncidencia(event)" class="space-y-4 sm:space-y-6">
                     
                     <div>
-                        <div class="flex items-center gap-2 pb-2 mb-3 sm:mb-4 border-b border-stone-100">
-                            <span class="w-5 h-5 sm:w-6 sm:h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-sm">1</span>
-                            <h3 class="font-bold text-brand-brown-dark text-sm sm:text-base">Datos de Ubicación (Obligatorios)</h3>
-                        </div>
-                        
-                        <div class="space-y-3 sm:space-y-4">
-                            <div>
-                                <label class="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1">Dirección exacta del problema *</label>
-                                <input type="text" id="vecino-direccion" required placeholder="Ej: Esquina con Calle X" class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/30">
-                                <p class="text-[10px] text-slate-400 mt-1">Calle y altura aproximada. Si no hay número, indique referencias.</p>
-                            </div>
 
+                        <!-- ======= MAPA Y GEOCODE ======= -->
                             <div>
-                                <label class="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1 flex justify-between">
-                                    <span>Marcar punto en el mapa *</span>
-                                    <span id="coordenadas-display" class="text-brand-green font-semibold font-mono text-[10px] sm:text-xs">Buscando ubicación...</span>
-                                </label>
-                                <div id="map-vecino" class="w-full h-52 sm:h-64 bg-stone-100 rounded-xl border border-stone-200 overflow-hidden relative z-10"></div>
-                                <input type="hidden" id="vecino-lat" required>
-                                <input type="hidden" id="vecino-lng" required>
+                                <div class="flex items-center gap-2 pb-2 mb-3 sm:mb-4 border-b border-stone-100">
+                                    <span class="w-5 h-5 sm:w-6 sm:h-6 bg-brand-green text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-sm">1</span>
+                                    <h3 class="font-bold text-brand-brown-dark text-sm sm:text-base">Datos de Ubicación (Obligatorios)</h3>
+                                </div>
+                                
+                                <div class="space-y-4 sm:space-y-5">
+                                    <!-- Buscador de Dirección -->
+                                    <div class="bg-white p-1 rounded-xl shadow-sm border border-stone-200 focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all duration-300">
+                                        <label class="block text-[10px] sm:text-xs font-bold text-slate-600 mb-1 px-2 pt-1">Dirección exacta del problema *</label>
+                                        <div class="flex flex-col sm:flex-row gap-2">
+                                            <input type="text" id="vecino-direccion" required placeholder="Ej: Los Eucaliptos 1250, San José del Rincón" class="flex-1 w-full px-3 py-2.5 text-sm bg-transparent border-none focus:outline-none focus:ring-0">
+                                            <button type="button" id="btn-buscar-direccion" onclick="geocodificarDireccion(true)" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-brand-green/10 text-brand-green-dark text-xs font-bold hover:bg-brand-green hover:text-white transition-all duration-300 m-1">
+                                                <i data-lucide="search" class="w-4 h-4"></i>
+                                                Ubicar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p id="estado-geocodificacion" class="text-[10px] text-slate-500 font-medium px-1 flex items-center gap-1 transition-colors"><i data-lucide="info" class="w-3 h-3"></i> Escriba una dirección y presione "Ubicar". Al tocar el mapa, la dirección se completará automáticamente.</p>
+                            
+                                    <!-- Mapa Interactivo -->
+                                    <div class="flex flex-col gap-2">
+                                        <label class="flex justify-between items-end text-[10px] sm:text-xs font-bold text-slate-600 px-1">
+                                            <span>Marcar punto en el mapa *</span>
+                                            <span id="coordenadas-display" class="text-brand-green-dark bg-brand-green-light px-2.5 py-1 rounded-md border border-brand-green/30 font-mono text-[10px] sm:text-xs shadow-sm transition-all">Buscando ubicación...</span>
+                                        </label>
+                                        
+                                        <div id="map-vecino" class="w-full h-60 sm:h-72 bg-stone-100 rounded-2xl border-2 border-stone-200 overflow-hidden relative z-10 shadow-inner"></div>
+                                        
+                                        <div class="mt-2 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between px-1">
+                                            <button type="button" id="btn-mi-ubicacion" onclick="obtenerUbicacionUsuario(true)" class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-green text-white text-xs font-bold shadow-md hover:bg-brand-green-dark hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                                                <i data-lucide="locate-fixed" class="w-4 h-4"></i>
+                                                Usar mi ubicación actual
+                                            </button>
+                                            <span id="precision-ubicacion" class="text-[10px] text-slate-500 font-medium bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center gap-1.5">
+                                                <i data-lucide="mouse-pointer-click" class="w-3 h-3"></i>
+                                                También puede tocar el mapa o arrastrar el marcador.
+                                            </span>
+                                        </div>
+                                        
+                                        <input type="hidden" id="vecino-lat" required>
+                                        <input type="hidden" id="vecino-lng" required>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- ======= BOTONES DE FOTOGRAFÍA: CÁMARA + GALERÍA ======= -->
@@ -1084,54 +1293,284 @@
         }
 
         // ==============================================
+        // 🔎 GEOCODIFICACIÓN DE DIRECCIONES
+        // ==============================================
+
+        const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org";
+        let ultimaConsultaGeocodificacion = 0;
+        let temporizadorDireccion = null;
+        let geocodificacionEnCurso = false;
+
+        function prepararGeocodificacionDireccion() {
+            const input = document.getElementById("vecino-direccion");
+            if (!input) return;
+
+            input.addEventListener("keydown", function(evento) {
+                if (evento.key === "Enter") {
+                    evento.preventDefault();
+                    geocodificarDireccion(true);
+                }
+            });
+
+            input.addEventListener("blur", function() {
+                clearTimeout(temporizadorDireccion);
+                temporizadorDireccion = setTimeout(() => {
+                    if (input.value.trim().length >= 5 && !document.getElementById("vecino-lat").value) {
+                        geocodificarDireccion(false);
+                    }
+                }, 350);
+            });
+        }
+
+        async function esperarLimiteNominatim() {
+            const transcurrido = Date.now() - ultimaConsultaGeocodificacion;
+            if (transcurrido < 1100) {
+                await new Promise(resolve => setTimeout(resolve, 1100 - transcurrido));
+            }
+            ultimaConsultaGeocodificacion = Date.now();
+        }
+
+        function setEstadoGeocodificacion(texto, esError = false) {
+            const estado = document.getElementById("estado-geocodificacion");
+            if (!estado) return;
+            estado.innerText = texto;
+            estado.classList.toggle("text-red-600", esError);
+            estado.classList.toggle("text-slate-400", !esError);
+        }
+
+        async function geocodificarDireccion(mostrarMensajes = false) {
+            if (geocodificacionEnCurso) return;
+            const input = document.getElementById("vecino-direccion");
+            const boton = document.getElementById("btn-buscar-direccion");
+            let consulta = input ? input.value.trim() : "";
+
+            if (consulta.length < 4) {
+                setEstadoGeocodificacion("Escriba una calle, altura o referencia más precisa.", true);
+                if (mostrarMensajes) showAlert("Ingrese una dirección antes de ubicarla.", "error");
+                return;
+            }
+
+            if (!/rinc[oó]n|santa fe|argentina/i.test(consulta)) {
+                consulta += ", San José del Rincón, Santa Fe, Argentina";
+            }
+
+            geocodificacionEnCurso = true;
+            if (boton) {
+                boton.disabled = true;
+                boton.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Buscando…';
+                lucide.createIcons();
+            }
+            setEstadoGeocodificacion("Buscando la dirección en el mapa…");
+
+            try {
+                await esperarLimiteNominatim();
+                const params = new URLSearchParams({
+                    q: consulta,
+                    format: "jsonv2",
+                    limit: "1",
+                    addressdetails: "1",
+                    countrycodes: "ar"
+                });
+                const respuesta = await fetch(`${NOMINATIM_BASE_URL}/search?${params.toString()}`, {
+                    headers: { "Accept-Language": "es-AR,es;q=0.9" }
+                });
+                if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+                const resultados = await respuesta.json();
+                if (!resultados.length) throw new Error("SIN_RESULTADOS");
+
+                const resultado = resultados[0];
+                const lat = Number(resultado.lat);
+                const lng = Number(resultado.lon);
+                colocarMarcadorVecino(lat, lng, true);
+                mapVecino.setView([lat, lng], 18);
+                setEstadoGeocodificacion(`Dirección localizada: ${resultado.display_name}`);
+                if (mostrarMensajes) showAlert("Dirección localizada. Revise y corrija el punto si fuera necesario.", "success");
+            } catch (error) {
+                const texto = error.message === "SIN_RESULTADOS"
+                    ? "No se encontró la dirección. Agregue calle, altura y localidad o marque el punto manualmente."
+                    : "No se pudo consultar el servicio de direcciones. Marque el punto manualmente o inténtelo nuevamente.";
+                setEstadoGeocodificacion(texto, true);
+                if (mostrarMensajes) showAlert(texto, "error");
+            } finally {
+                geocodificacionEnCurso = false;
+                if (boton) {
+                    boton.disabled = false;
+                    boton.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i> Ubicar dirección';
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        async function completarDireccionDesdeCoordenadas(lat, lng, mostrarMensajes = false) {
+            if (geocodificacionEnCurso) return;
+            geocodificacionEnCurso = true;
+            setEstadoGeocodificacion("Buscando la dirección correspondiente al punto…");
+            try {
+                await esperarLimiteNominatim();
+                const params = new URLSearchParams({
+                    lat: String(lat),
+                    lon: String(lng),
+                    format: "jsonv2",
+                    zoom: "18",
+                    addressdetails: "1"
+                });
+                const respuesta = await fetch(`${NOMINATIM_BASE_URL}/reverse?${params.toString()}`, {
+                    headers: { "Accept-Language": "es-AR,es;q=0.9" }
+                });
+                if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+                const resultado = await respuesta.json();
+                if (!resultado || resultado.error) throw new Error("SIN_DIRECCION");
+
+                const direccion = resultado.address || {};
+                const calle = direccion.road || direccion.pedestrian || direccion.path || direccion.neighbourhood || "";
+                const altura = direccion.house_number || "";
+                const localidad = direccion.city || direccion.town || direccion.village || direccion.municipality || "";
+                const direccionBreve = [calle, altura].filter(Boolean).join(" ");
+                const textoFinal = [direccionBreve, localidad].filter(Boolean).join(", ") || resultado.display_name;
+                document.getElementById("vecino-direccion").value = textoFinal;
+                setEstadoGeocodificacion(`Dirección obtenida del punto: ${resultado.display_name}`);
+                if (mostrarMensajes) showAlert("La dirección se completó desde el punto seleccionado.", "success");
+            } catch (error) {
+                setEstadoGeocodificacion("El punto quedó guardado, pero no fue posible obtener automáticamente su dirección.", true);
+            } finally {
+                geocodificacionEnCurso = false;
+            }
+        }
+
+        // ==============================================
+        // 📍 COLOCAR MARCADOR VECINO CON PIN VERDE
+        // ==============================================
+        function colocarMarcadorVecino(lat, lng, completarDireccion = false) {
+            const punto = L.latLng(Number(lat), Number(lng));
+            
+            // 🎨 PIN VERDE PERSONALIZADO
+            const pinVerde = L.divIcon({
+                className: 'custom-vecino-pin',
+                html: `
+                    <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#2e9d36" stroke="#1c6622" stroke-width="2"/>
+                            <circle cx="12" cy="9" r="3" fill="white" stroke="#1c6622" stroke-width="1.5"/>
+                            <circle cx="12" cy="9" r="1.5" fill="#2e9d36"/>
+                        </svg>
+                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #2e9d36; border-radius: 50%; box-shadow: 0 0 16px rgba(46, 157, 54, 0.6); animation: pulse-green 1.5s ease-in-out infinite;"></div>
+                    </div>
+                `,
+                iconSize: [38, 38],
+                iconAnchor: [19, 38],
+                popupAnchor: [0, -38]
+            });
+
+            if (vecinoMarker) {
+                vecinoMarker.setLatLng(punto);
+                vecinoMarker.setIcon(pinVerde);
+            } else {
+                vecinoMarker = L.marker(punto, { 
+                    draggable: true,
+                    icon: pinVerde
+                }).addTo(mapVecino);
+                
+                vecinoMarker.on("dragend", function() {
+                    const nuevoPunto = vecinoMarker.getLatLng();
+                    updateVecinoCoordenadas(nuevoPunto.lat.toFixed(7), nuevoPunto.lng.toFixed(7));
+                    if (vecinoAccuracyCircle) {
+                        mapVecino.removeLayer(vecinoAccuracyCircle);
+                        vecinoAccuracyCircle = null;
+                    }
+                    document.getElementById("precision-ubicacion").innerText = "Ubicación ajustada manualmente.";
+                    completarDireccionDesdeCoordenadas(nuevoPunto.lat, nuevoPunto.lng);
+                });
+            }
+            updateVecinoCoordenadas(Number(lat).toFixed(7), Number(lng).toFixed(7));
+            if (completarDireccion) completarDireccionDesdeCoordenadas(lat, lng);
+        }
+
+        // ==============================================
         // 📍 GEOLOCALIZACIÓN AUTOMÁTICA
         // ==============================================
 
-        function obtenerUbicacionUsuario() {
+        function obtenerUbicacionUsuario(mostrarMensajes = false) {
+            const boton = document.getElementById("btn-mi-ubicacion");
+            const precision = document.getElementById("precision-ubicacion");
+
             if (!navigator.geolocation) {
-                console.log("Geolocalización no soportada por el navegador");
                 document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
+                if (mostrarMensajes) showAlert("Este navegador no permite obtener la ubicación. Seleccione el punto manualmente en el mapa.", "error");
                 return;
             }
+
+            if (boton) {
+                boton.disabled = true;
+                boton.classList.add("opacity-60", "cursor-wait");
+                boton.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Buscando ubicación…';
+                lucide.createIcons();
+            }
+            if (precision) precision.innerText = "Consultando el GPS del dispositivo…";
 
             navigator.geolocation.getCurrentPosition(
                 function(posicion) {
                     const lat = posicion.coords.latitude;
                     const lng = posicion.coords.longitude;
-                    console.log("📍 Ubicación obtenida:", lat, lng);
-                    
-                    // Mover el mapa a la ubicación del usuario
-                    mapVecino.setView([lat, lng], 16);
-                    
-                    // Crear o mover el marcador
+                    const accuracy = Math.round(posicion.coords.accuracy || 0);
+
+                    mapVecino.setView([lat, lng], accuracy > 100 ? 17 : 18);
+
                     if (vecinoMarker) {
                         vecinoMarker.setLatLng([lat, lng]);
                     } else {
                         vecinoMarker = L.marker([lat, lng], { draggable: true }).addTo(mapVecino);
                         vecinoMarker.on('dragend', function() {
-                            const newLat = vecinoMarker.getLatLng().lat.toFixed(7);
-                            const newLng = vecinoMarker.getLatLng().lng.toFixed(7);
-                            updateVecinoCoordenadas(newLat, newLng);
+                            const punto = vecinoMarker.getLatLng();
+                            updateVecinoCoordenadas(punto.lat.toFixed(7), punto.lng.toFixed(7));
+                            if (vecinoAccuracyCircle) {
+                                mapVecino.removeLayer(vecinoAccuracyCircle);
+                                vecinoAccuracyCircle = null;
+                            }
+                            if (precision) precision.innerText = "Ubicación ajustada manualmente.";
                         });
                     }
-                    
+
+                    if (vecinoAccuracyCircle) mapVecino.removeLayer(vecinoAccuracyCircle);
+                    if (accuracy > 0) {
+                        vecinoAccuracyCircle = L.circle([lat, lng], {
+                            radius: accuracy,
+                            weight: 1,
+                            opacity: 0.8,
+                            fillOpacity: 0.12
+                        }).addTo(mapVecino);
+                    }
+
                     updateVecinoCoordenadas(lat.toFixed(7), lng.toFixed(7));
+                    if (precision) precision.innerText = accuracy ? `Precisión estimada: ±${accuracy} m. Puede corregir el punto.` : "Ubicación capturada.";
+                    if (mostrarMensajes) showAlert("Ubicación capturada correctamente. Revise el punto antes de guardar.", "success");
+                    restaurarBotonUbicacion();
                 },
                 function(error) {
-                    console.warn("⚠️ Error al obtener ubicación:", error.message);
                     document.getElementById("coordenadas-display").innerText = "Haga clic en el mapa";
-                    
-                    // Si hay error, mostrar un mensaje amigable
-                    if (error.code === 1) {
-                        showAlert("ℹ️ Para mejor precisión, permita el acceso a la ubicación en su navegador. Puede tocar el mapa para seleccionar manualmente.", "success");
-                    }
+                    const mensajes = {
+                        1: "El permiso de ubicación fue rechazado. Habilítelo en el navegador o seleccione el punto manualmente.",
+                        2: "No fue posible determinar la ubicación del dispositivo.",
+                        3: "La búsqueda de ubicación tardó demasiado. Inténtelo nuevamente."
+                    };
+                    if (precision) precision.innerText = mensajes[error.code] || "No se pudo obtener la ubicación.";
+                    if (mostrarMensajes) showAlert(mensajes[error.code] || "No se pudo obtener la ubicación.", "error");
+                    restaurarBotonUbicacion();
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
+                    timeout: 15000,
+                    maximumAge: 0
                 }
             );
+        }
+
+        function restaurarBotonUbicacion() {
+            const boton = document.getElementById("btn-mi-ubicacion");
+            if (!boton) return;
+            boton.disabled = false;
+            boton.classList.remove("opacity-60", "cursor-wait");
+            boton.innerHTML = '<i data-lucide="locate-fixed" class="w-4 h-4"></i> Usar mi ubicación actual';
+            lucide.createIcons();
         }
 
 window.onload = function() {
@@ -1155,6 +1594,7 @@ window.onload = function() {
 
             initMapVecino();
             initMapAdmin();
+            prepararGeocodificacionDireccion();
             
             renderRecentVecinoList();
             renderExpedientesTable();
@@ -1275,27 +1715,54 @@ window.onload = function() {
             updateQuickStats();
         }
 
+        // ==============================================
+        // 🗺️ INICIALIZAR MAPA VECINO
+        // ==============================================
         function initMapVecino() {
-            mapVecino = L.map('map-vecino').setView(RINCON_NORTE_COORDS, 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© Colaboradores de OpenStreetMap'
+            mapVecino = L.map('map-vecino', {
+                zoomControl: true,
+                touchZoom: true,
+                scrollWheelZoom: true
+            }).setView(RINCON_NORTE_COORDS, 15);
+            
+            // 🗺️ PRIMERO: OpenStreetMap (capa por defecto)
+            const osmVecino = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© Colaboradores de OpenStreetMap',
+                maxZoom: 20
             }).addTo(mapVecino);
 
-            mapVecino.on('click', function(e) {
-                const lat = e.latlng.lat.toFixed(7);
-                const lng = e.latlng.lng.toFixed(7);
-
-                if (vecinoMarker) {
-                    vecinoMarker.setLatLng(e.latlng);
-                } else {
-                    vecinoMarker = L.marker(e.latlng, { draggable: true }).addTo(mapVecino);
-                    vecinoMarker.on('dragend', function() {
-                        const newLat = vecinoMarker.getLatLng().lat.toFixed(7);
-                        const newLng = vecinoMarker.getLatLng().lng.toFixed(7);
-                        updateVecinoCoordenadas(newLat, newLng);
-                    });
+            // 🛰️ SEGUNDO: Satélite Esri (capa secundaria)
+            const esriSateliteVecino = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                {
+                    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics y otros',
+                    maxZoom: 20
                 }
-                updateVecinoCoordenadas(lat, lng);
+            );
+
+            // 🎨 BOTÓN DE LAYERS COMPACTO Y RECTANGULAR
+            const layerControl = L.control.layers({
+                '<span style="display:flex;align-items:center;gap:6px;"></span> <span style="font-weight:600;font-size:12px;">MAPA</span></span>': osmVecino,
+                '<span style="display:flex;align-items:center;gap:6px;"></span> <span style="font-weight:600;font-size:12px;">SATÉLITE</span></span>': esriSateliteVecino
+            }, null, { 
+                position: 'topright', 
+                collapsed: false
+            }).addTo(mapVecino);
+
+            // Aplicar clase personalizada al contenedor del control
+            const container = layerControl.getContainer();
+            if (container) {
+                container.className += ' leaflet-control-layers-vecino';
+            }
+
+            mapVecino.on('click', function(e) {
+                if (vecinoAccuracyCircle) {
+                    mapVecino.removeLayer(vecinoAccuracyCircle);
+                    vecinoAccuracyCircle = null;
+                }
+                const precision = document.getElementById("precision-ubicacion");
+                if (precision) precision.innerText = "Ubicación seleccionada manualmente.";
+                colocarMarcadorVecino(e.latlng.lat, e.latlng.lng, true);
             });
         }
 
@@ -1305,10 +1772,39 @@ window.onload = function() {
             document.getElementById("coordenadas-display").innerText = `${lat}, ${lng}`;
         }
 
+        function updateVecinoCoordenadas(lat, lng) {
+            document.getElementById("vecino-lat").value = lat;
+            document.getElementById("vecino-lng").value = lng;
+            document.getElementById("coordenadas-display").innerText = `${lat}, ${lng}`;
+        }
+
+        // ==============================================
+        // 🗺️ INICIALIZAR MAPA ADMIN
+        // ==============================================
         function initMapAdmin() {
             mapAdmin = L.map('map-admin').setView(RINCON_NORTE_COORDS, 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© Colaboradores de OpenStreetMap'
+            
+            // 🗺️ PRIMERO: OpenStreetMap (capa por defecto)
+            const osmAdmin = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© Colaboradores de OpenStreetMap',
+                maxZoom: 20
+            }).addTo(mapAdmin);
+
+            // 🛰️ SEGUNDO: Satélite Esri (capa secundaria)
+            const esriSateliteAdmin = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                {
+                    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics y otros',
+                    maxZoom: 20
+                }
+            );
+
+            L.control.layers({
+                'Calles OpenStreetMap': osmAdmin,
+                'Satélite Esri': esriSateliteAdmin
+            }, null, { 
+                position: 'topright', 
+                collapsed: true
             }).addTo(mapAdmin);
 
             adminMarkersGroup = L.layerGroup().addTo(mapAdmin);
@@ -1351,6 +1847,9 @@ window.onload = function() {
             });
         }
 
+        // ==============================================
+        // 🔄 SUBCATEGORÍAS
+        // ==============================================
         
         function updateSubcategories(categoria) {
             const subSection = document.getElementById("subcategories-section");
