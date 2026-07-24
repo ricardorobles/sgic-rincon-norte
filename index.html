@@ -1734,7 +1734,8 @@
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({
-                    action: "deleteAll"
+                    action: "deleteAll",
+                    usuario: currentUsername || ""
                 })
             })
             .then(response => response.text())
@@ -2490,7 +2491,10 @@
                 fecha: nuevaAct.fecha,
                 accion: nuevaAct.accion,
                 autor: nuevaAct.autor,
-                detalles: nuevaAct.detalles
+                detalles: nuevaAct.detalles,
+                prioridad: inc.prioridad || "",
+                estado: inc.estado || "",
+                usuario: currentUsername || ""
             };
 
             fetch(webAppUrl, {
@@ -2545,7 +2549,8 @@
                 id: inc.id,
                 estado: inc.estado,
                 prioridad: inc.prioridad,
-                observaciones: inc.observaciones
+                observaciones: inc.observaciones,
+                usuario: currentUsername || ""
             };
 
             fetch(webAppUrl, {
@@ -2629,7 +2634,8 @@
             const payload = {
                 action: "delete",
                 id: id,
-                borrado: "borrado"
+                borrado: "borrado",
+                usuario: currentUsername || ""
             };
 
             fetch(webAppUrl, {
