@@ -2167,20 +2167,6 @@
                     colocarMarcadorAdmin(lat, lng);
                     mapAdmin.setView([lat, lng], accuracy > 100 ? 17 : 18);
 
-                    if (adminAccuracyCircle) {
-                        mapAdmin.removeLayer(adminAccuracyCircle);
-                        adminAccuracyCircle = null;
-                    }
-
-                    if (accuracy > 0) {
-                        adminAccuracyCircle = L.circle([lat, lng], {
-                            radius: accuracy,
-                            weight: 1,
-                            opacity: 0.8,
-                            fillOpacity: 0.10
-                        }).addTo(mapAdmin);
-                    }
-
                     setEstadoGeocodificacionAdmin(
                         accuracy
                             ? `Ubicación actual localizada. Precisión estimada: ±${accuracy} m.`
