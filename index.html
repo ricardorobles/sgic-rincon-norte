@@ -2759,6 +2759,22 @@
                 try {
                     const data = JSON.parse(text);
                     if (data.status === "success") {
+                        // Incorporar al historial local la actuación automática
+                        // devuelta por Apps Script, para que aparezca al volver a abrir la ficha.
+                        if (data.actuacion) {
+                            if (!Array.isArray(inc.actuaciones)) inc.actuaciones = [];
+                            inc.actuaciones.push({
+                                fecha: data.actuacion.fecha,
+                                accion: data.actuacion.accion || "Actualización de expediente",
+                                autor: data.actuacion.autor || usuarioActivo,
+                                detalles: data.actuacion.detalles || "",
+                                prioridad: data.actuacion.prioridad || inc.prioridad,
+                                estado: data.actuacion.estado || inc.estado,
+                                usuario: data.actuacion.usuario || usuarioActivo
+                            });
+                            localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
+                        }
+
                         closeModal();
                         showAlert(`✅ ¡Expediente ${inc.id} actualizado con éxito en la nube!`, "success");
 
