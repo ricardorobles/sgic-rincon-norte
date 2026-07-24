@@ -1682,7 +1682,7 @@
             renderStatsCharts();
             updateQuickStats();
 
-            // ✅ LLAMADA A LA NUBE PARA TRAER LOS DATOS REALES DE GOOGLE SHEETS
+            // ✅ LLAMADA A LA NUBE PARA TRAER LOS DATOS REALES DE BASE DE DATOS
             cargarIncidenciasDesdeNube();
 
             // Intentar obtener ubicación automáticamente después de cargar el mapa
@@ -2074,7 +2074,7 @@
         }
 
         // ==============================================
-        // 💾 GUARDAR INCIDENCIA (envía a Google Sheets)
+        // 💾 GUARDAR INCIDENCIA (envía a base de datos)
         // ==============================================
         function saveIncidencia(e) {
             e.preventDefault();
@@ -2697,7 +2697,7 @@
                         document.getElementById("form-actuacion-container").classList.add("hidden");
 
                         renderFichaActuaciones(inc.actuaciones);
-                        showAlert("¡Actuación incorporada y guardada en Google Sheets!", "success");
+                        showAlert("¡Actuación incorporada y guardada en base de datos!", "success");
                     } else {
                         showAlert(`⚠️ Error al guardar actuación: ${data.message}`, "error");
                     }
@@ -2737,7 +2737,7 @@
             // Guardar localmente
             localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
-            showAlert(`⏳ Actualizando registro en Google Sheets...`, "success");
+            showAlert(`⏳ Actualizando registro en base de datos...`, "success");
 
             // Enviar los cambios a la nube mediante fetch
             const payload = {
@@ -2860,12 +2860,12 @@
                 }
 
                 // Se elimina solamente de la vista local.
-                // En Google Sheets el registro permanece y la columna O queda marcada como "borrado".
+                // En base de datos el registro permanece y la columna O queda marcada como "borrado".
                 incidencias = incidencias.filter(i => i.id !== id);
                 localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
                 closeModal();
-                showAlert(`✅ El expediente ${id} fue dado de baja. El registro permanece en Google Sheets marcado como "borrado".`, "success");
+                showAlert(`✅ El expediente ${id} fue dado de baja. El registro permanece en base de datos marcado como "borrado".`, "success");
 
                 renderRecentVecinoList();
                 renderExpedientesTable();
@@ -3076,7 +3076,7 @@
         }
 
         // ==============================================
-        // ☁️ FUNCIÓN PARA LEER DATOS DESDE GOOGLE SHEETS
+        // ☁️ FUNCIÓN PARA LEER DATOS DESDE BASE DE DATOS
         // ==============================================
         function cargarIncidenciasDesdeNube() {
 
@@ -3085,7 +3085,7 @@
             .then(data => {
                 if (data.status === "success") {
                     // Los registros marcados como "borrado" en la columna O permanecen
-                    // en Google Sheets, pero se excluyen de todas las vistas del sistema.
+                    // en base de datos, pero se excluyen de todas las vistas del sistema.
                     incidencias = (data.data || []).filter(inc => {
                         const marcaBorrado = String(
                             inc.borrado ?? inc.Borrado ?? inc.eliminado ?? inc.Eliminado ?? ""
@@ -3121,7 +3121,7 @@
                     renderStatsCharts();
                     updateQuickStats();
 
-                    console.log("✅ Datos sincronizados correctamente desde Google Sheets.");
+                    console.log("✅ Datos sincronizados correctamente desde base de datos.");
                 } else {
                     console.error("Error al leer desde la nube:", data.message);
                 }
