@@ -629,10 +629,7 @@
                         <i data-lucide="settings" class="w-3 h-3 sm:w-4 sm:h-4 text-slate-600"></i>
                         <span class="hidden xs:inline">Configuración</span>
                     </button>
-                    <button onclick="triggerRiskReplanning()" class="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 bg-brand-brown-light/40 border border-brand-brown/15 text-brand-brown-dark hover:bg-brand-brown-light/70 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-semibold transition">
-                        <i data-lucide="refresh-cw" class="w-3 h-3 sm:w-4 sm:h-4 text-brand-brown"></i>
-                        <span class="hidden xs:inline">Replantear Riesgo</span>
-                    </button>
+                    
                     <button onclick="exportExcel()" class="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-bold transition shadow-sm">
                         <i data-lucide="file-spreadsheet" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                         <span class="hidden xs:inline">Excel</span>
@@ -654,7 +651,7 @@
                         <i data-lucide="alert-circle" class="w-4 h-4 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Pendientes/Críticas</p>
+                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Pendientes</p>
                         <h4 id="stat-pending-critical" class="text-base sm:text-lg font-bold text-slate-900">--</h4>
                     </div>
                 </div>
@@ -663,7 +660,7 @@
                         <i data-lucide="clipboard-list" class="w-4 h-4 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">En Gestión</p>
+                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">En Gestión/Derivada</p>
                         <h4 id="stat-in-progress" class="text-base sm:text-lg font-bold text-slate-900">--</h4>
                     </div>
                 </div>
@@ -672,7 +669,7 @@
                         <i data-lucide="check-check" class="w-4 h-4 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Resueltas</p>
+                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Resueltas/Cerradas</p>
                         <h4 id="stat-resolved" class="text-base sm:text-lg font-bold text-slate-900">--</h4>
                     </div>
                 </div>
@@ -683,6 +680,82 @@
                     <div>
                         <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Total</p>
                         <h4 id="stat-total" class="text-base sm:text-lg font-bold text-slate-900">--</h4>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- FILTROS GLOBALES DEL PANEL ADMIN -->
+            <div class="bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-stone-200/60 no-print">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold text-brand-brown-dark flex items-center gap-2">
+                            <i data-lucide="filter" class="w-4 h-4 text-brand-green"></i>
+                            Filtros generales
+                        </h3>
+                        <p class="text-[9px] sm:text-[10px] text-stone-500 mt-0.5">
+                            Se aplican al mapa, la base de datos, las estadísticas y los indicadores.
+                        </p>
+                    </div>
+                    <span id="filter-result-count" class="px-2.5 py-1 rounded-full bg-brand-green-light text-brand-green-dark border border-brand-green/20 text-[9px] sm:text-[10px] font-bold">
+                        -- resultados
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 sm:gap-3">
+                    <div class="lg:col-span-2">
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Buscar</label>
+                        <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Dirección, código o comentario..."
+                               class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Categoría</label>
+                        <select id="filter-category" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                            <option value="Todos">Todas</option>
+                            <option value="Infraestructura">Infraestructura</option>
+                            <option value="Escurrimiento">Escurrimiento</option>
+                            <option value="Circulación">Circulación</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Estado</label>
+                        <select id="filter-status" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                            <option value="Todos">Todos</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Verificada">Verificada</option>
+                            <option value="En gestión">En gestión</option>
+                            <option value="Derivada">Derivada</option>
+                            <option value="Resuelta">Resuelta</option>
+                            <option value="Cerrada">Cerrada</option>
+                            <option value="Descartada">Descartada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Prioridad</label>
+                        <select id="filter-priority" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                            <option value="Todos">Todas</option>
+                            <option value="Crítica">Crítica</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Fecha desde</label>
+                        <input type="date" id="filter-date-from" onchange="applyFilters()"
+                               class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Fecha hasta</label>
+                        <div class="flex gap-2">
+                            <input type="date" id="filter-date-to" onchange="applyFilters()"
+                                   class="min-w-0 flex-1 px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
+                            <button type="button" onclick="resetFilters()" title="Limpiar filtros"
+                                    class="shrink-0 px-2.5 min-h-[38px] text-slate-600 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg transition">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -712,7 +785,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-stone-50 p-2 sm:p-3 rounded-xl border border-stone-100">
                             <div class="flex items-center gap-2">
                                 <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <p class="text-[10px] sm:text-xs text-slate-600 font-medium">Ubicación del último replanteo de Rincón Norte activo.</p>
+                                <p class="text-[10px] sm:text-xs text-slate-600 font-medium">Incidencias visibles según los filtros generales activos.</p>
                             </div>
                             <div class="flex gap-1.5 sm:gap-2 text-[9px] sm:text-[11px] flex-wrap">
                                 <span class="flex items-center gap-0.5 sm:gap-1 text-rose-700 font-bold"><span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-600"></span>Crítica</span>
@@ -726,52 +799,7 @@
 
                     <div id="panel-admin-expedientes" class="hidden space-y-4 sm:space-y-6">
 
-                        <div class="bg-stone-50 p-3 sm:p-4 rounded-xl border border-stone-200/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3">
-                            <div>
-                                <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-0.5 sm:mb-1">Buscar</label>
-                                <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Ej: Esquina..." class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
-                            </div>
-                            <div>
-                                <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-0.5 sm:mb-1">Categoría</label>
-                                <select id="filter-category" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
-                                    <option value="Todos">Todas</option>
-                                    <option value="Infraestructura">Infraestructura</option>
-                                    <option value="Escurrimiento">Escurrimiento</option>
-                                    <option value="Circulación">Circulación</option>
-                                    <option value="Mantenimiento">Mantenimiento</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-0.5 sm:mb-1">Estado</label>
-                                <select id="filter-status" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
-                                    <option value="Todos">Todos</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                    <option value="Verificada">Verificada</option>
-                                    <option value="En gestión">En gestión</option>
-                                    <option value="Derivada">Derivada</option>
-                                    <option value="Resuelta">Resuelta</option>
-                                    <option value="Cerrada">Cerrada</option>
-                                    <option value="Descartada">Descartada</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-0.5 sm:mb-1">Prioridad</label>
-                                <select id="filter-priority" onchange="applyFilters()" class="w-full px-2 py-1.5 text-[10px] sm:text-xs border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green min-h-[38px]">
-                                    <option value="Todos">Todas</option>
-                                    <option value="Crítica">Crítica</option>
-                                    <option value="Alta">Alta</option>
-                                    <option value="Media">Media</option>
-                                    <option value="Baja">Baja</option>
-                                </select>
-                            </div>
-                            <div class="flex items-end">
-                                <button onclick="resetFilters()" class="w-full py-1.5 text-[10px] sm:text-xs font-bold text-slate-600 bg-white hover:bg-stone-100 border border-stone-200 rounded-lg transition min-h-[38px]">
-                                    Limpiar
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto border border-stone-200/60 rounded-xl">
+<div class="overflow-x-auto border border-stone-200/60 rounded-xl">
                             <table class="w-full text-left border-collapse text-[9px] sm:text-xs">
                                 <thead>
                                     <tr class="bg-stone-50 text-[8px] sm:text-[11px] font-bold uppercase tracking-wider text-stone-500 border-b border-stone-100">
@@ -987,10 +1015,10 @@
                 <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="text-center sm:text-left">
                         <p class="text-[10px] sm:text-[11px] font-bold text-rose-900">Restablecer Base de Datos</p>
-                        <p class="text-[8px] sm:text-[10px] text-rose-700">Da de baja todas las incidencias sin eliminar las filas de Google Sheets.</p>
+                        <p class="text-[8px] sm:text-[10px] text-rose-700">Da de baja todas las incidencias según el filtro sin eliminar la base de datos.</p>
                     </div>
                     <button onclick="confirmClearAllData()" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow shrink-0 min-h-[42px]">
-                        Borrar Todo
+                        Reestablecer
                     </button>
                 </div>
             </div>
@@ -1096,32 +1124,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <h4 class="text-[9px] sm:text-xs font-bold text-stone-500 uppercase tracking-wider pb-1 border-b border-stone-100 mb-2">Gestión Documental</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                        <div class="p-2 sm:p-2.5 border border-stone-200 rounded-lg flex items-center justify-between text-[9px] sm:text-xs hover:bg-slate-50 transition cursor-pointer" onclick="viewAttachedDoc('Nota Presentada al Municipio de Santa Fe')">
-                            <div class="flex items-center gap-1.5 sm:gap-2">
-                                <i data-lucide="file-text" class="text-red-500 w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <div class="text-left">
-                                    <p class="font-medium text-slate-800 text-[9px] sm:text-xs">Nota Municipio</p>
-                                    <p class="text-[8px] sm:text-[10px] text-stone-400">PDF - 15/06/2026</p>
-                                </div>
-                            </div>
-                            <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 text-slate-400"></i>
-                        </div>
-                        <div class="p-2 sm:p-2.5 border border-stone-200 rounded-lg flex items-center justify-between text-[9px] sm:text-xs hover:bg-slate-50 transition cursor-pointer" onclick="viewAttachedDoc('Respuesta Oficial Dirección de Asuntos Hídricos')">
-                            <div class="flex items-center gap-1.5 sm:gap-2">
-                                <i data-lucide="file-check" class="text-emerald-500 w-4 h-4 sm:w-5 sm:h-5"></i>
-                                <div class="text-left">
-                                    <p class="font-medium text-slate-800 text-[9px] sm:text-xs">Respuesta Oficial</p>
-                                    <p class="text-[8px] sm:text-[10px] text-stone-400">PDF - 30/06/2026</p>
-                                </div>
-                            </div>
-                            <i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4 text-slate-400"></i>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
             <div class="p-3 sm:p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap justify-between items-center gap-2 sm:gap-3 rounded-b-2xl no-print">
@@ -1139,7 +1141,7 @@
                     <button onclick="closeModal()" class="px-3 py-1 sm:px-4 sm:py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[9px] sm:text-xs font-bold rounded-lg transition min-h-[34px]">
                         Cerrar
                     </button>
-                    <button onclick="saveFichaChanges()" class="px-3 py-1 sm:px-4 sm:py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-[9px] sm:text-xs font-bold rounded-lg transition shadow-md min-h-[34px]">
+                    <button id="btn-save-ficha" disabled onclick="saveFichaChanges()" class="px-3 py-1 sm:px-4 sm:py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-[9px] sm:text-xs font-bold rounded-lg transition shadow-md min-h-[34px] disabled:bg-stone-300 disabled:text-stone-500 disabled:cursor-not-allowed disabled:shadow-none">
                         Guardar
                     </button>
                 </div>
@@ -1193,6 +1195,32 @@
         let mapVecino, mapAdmin;
         let vecinoMarker, adminMarkersGroup, vecinoAccuracyCircle;
         let activeFichaId = null;
+        let fichaOriginalState = null;
+
+        function getFichaCurrentState() {
+            return {
+                estado: document.getElementById("ficha-select-estado").value,
+                prioridad: document.getElementById("ficha-select-prioridad").value,
+                observaciones: document.getElementById("ficha-observaciones").value
+            };
+        }
+
+        function updateFichaSaveButton() {
+            const btn = document.getElementById("btn-save-ficha");
+            if (!btn || !fichaOriginalState) return;
+            const actual = getFichaCurrentState();
+            btn.disabled = !(
+                actual.estado !== fichaOriginalState.estado ||
+                actual.prioridad !== fichaOriginalState.prioridad ||
+                actual.observaciones !== fichaOriginalState.observaciones
+            );
+        }
+
+        function setFichaOriginalState() {
+            fichaOriginalState = getFichaCurrentState();
+            updateFichaSaveButton();
+        }
+
 
         let currentAccessType = sessionStorage.getItem("SGIC_access_type") || null;
         let currentUsername = sessionStorage.getItem("SGIC_username") || null;
@@ -1627,7 +1655,23 @@
 
             loadIntroTextUI();
 
-            document.getElementById("vecino-fecha").value = new Date().toISOString().split('T')[0];
+            const hoy = new Date();
+            document.getElementById("vecino-fecha").value = hoy.toISOString().split('T')[0];
+
+            // Filtro de fechas por defecto: desde dos meses atrás hasta hoy.
+            const dosMesesAtras = new Date(hoy);
+            dosMesesAtras.setMonth(dosMesesAtras.getMonth() - 2);
+
+            document.getElementById("filter-date-from").value = dosMesesAtras.toISOString().split('T')[0];
+            document.getElementById("filter-date-to").value = hoy.toISOString().split('T')[0];
+
+            ["ficha-select-estado", "ficha-select-prioridad", "ficha-observaciones"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener("input", updateFichaSaveButton);
+                    el.addEventListener("change", updateFichaSaveButton);
+                }
+            });
 
             initMapVecino();
             initMapAdmin();
@@ -1722,9 +1766,16 @@
         }
 
         function confirmClearAllData() {
+            const filtradas = getFilteredIncidencias();
+
+            if (filtradas.length === 0) {
+                showAlert("No hay incidencias dentro del filtro actual para dar de baja.", "error");
+                return;
+            }
+
             showConfirm(
-                "¿DAR DE BAJA TODAS LAS INCIDENCIAS?",
-                'Esta acción marcará como "borrado" todas las incidencias activas en la columna O de Google Sheets. Los registros no se eliminarán físicamente, pero dejarán de mostrarse en el sistema.',
+                "¿DAR DE BAJA LAS INCIDENCIAS FILTRADAS?",
+                `Esta acción marcará como "borrado" ${filtradas.length} incidencia${filtradas.length === 1 ? "" : "s"} correspondiente${filtradas.length === 1 ? "" : "s"} al filtro actual. Los demás registros permanecerán sin cambios.`,
                 function() {
                     executeClearAllData();
                 }
@@ -1732,14 +1783,29 @@
         }
 
         function executeClearAllData() {
-            showAlert("⏳ Dando de baja todas las incidencias...", "success");
+            const filtradas = getFilteredIncidencias();
+            const idsFiltrados = filtradas.map(i => i.id).filter(Boolean);
+            const usuario = getCurrentUsername();
+
+            if (!usuario) {
+                showAlert("No se pudo identificar al usuario autenticado.", "error");
+                return;
+            }
+
+            if (idsFiltrados.length === 0) {
+                showAlert("No hay incidencias dentro del filtro actual para dar de baja.", "error");
+                return;
+            }
+
+            showAlert(`⏳ Dando de baja ${idsFiltrados.length} incidencia${idsFiltrados.length === 1 ? "" : "s"} del filtro actual...`, "success");
 
             fetch(webAppUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({
                     action: "deleteAll",
-                    usuario: getCurrentUsername()
+                    usuario: usuario,
+                    ids: idsFiltrados
                 })
             })
             .then(response => response.text())
@@ -1756,27 +1822,25 @@
                     throw new Error(data.message || "No se pudieron dar de baja las incidencias.");
                 }
 
-                // Limpiamos únicamente las vistas locales.
-                // Las filas permanecen en Google Sheets marcadas como "borrado".
-                incidencias = [];
+                const idsBorrados = new Set(data.ids || idsFiltrados);
+
+                // Solo quitamos de la vista local los registros afectados por el filtro.
+                incidencias = incidencias.filter(i => !idsBorrados.has(i.id));
                 localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
 
                 closeConfigEspecial();
 
                 const cantidad = Number(data.count || 0);
                 showAlert(
-                    `✅ Se dieron de baja ${cantidad} incidencia${cantidad === 1 ? "" : "s"}. Los registros permanecen en Google Sheets marcados como "borrado".`,
+                    `✅ Se dieron de baja ${cantidad} incidencia${cantidad === 1 ? "" : "s"} del filtro actual.`,
                     "success"
                 );
 
                 renderRecentVecinoList();
-                renderExpedientesTable();
-                renderAdminMarkers();
-                renderStatsCharts();
-                updateQuickStats();
+                applyFilters();
             })
             .catch(error => {
-                console.error("Error al dar de baja todas las incidencias:", error);
+                console.error("Error al dar de baja las incidencias filtradas:", error);
                 showAlert(`⚠️ No se pudo completar la baja masiva: ${error.message}`, "error");
             });
         }
@@ -1869,11 +1933,13 @@
             renderAdminMarkers();
         }
 
-        function renderAdminMarkers() {
-            adminMarkersGroup.clearLayers();
+        function renderAdminMarkers(filteredData = null) {
+            if (!adminMarkersGroup) return;
 
-            incidencias.forEach(inc => {
-                // Si la incidencia no tiene coordenadas válidas, la saltamos para que no rompa el mapa
+            adminMarkersGroup.clearLayers();
+            const data = filteredData || getFilteredIncidencias();
+
+            data.forEach(inc => {
                 if (!inc.lat || !inc.lng || isNaN(inc.lat) || isNaN(inc.lng)) return;
 
                 let color = '#2e9d36';
@@ -1896,16 +1962,12 @@
                         <h4 class="font-bold text-xs text-slate-900">${inc.id}</h4>
                         <p class="text-[11px] text-slate-700"><strong>Cat:</strong> ${inc.categoria}</p>
                         <p class="text-[10px] text-slate-500">${inc.direccion}</p>
-                        <button onclick="openFicha('${inc.id}')" class="w-full mt-2 py-1 bg-brand-green hover:bg-brand-green-dark text-white font-bold text-[10px] rounded transition shadow-sm">
-                            Ver Ficha Técnica
-                        </button>
+                        <button onclick="openFicha('${inc.id}')" class="w-full mt-1 py-1 bg-brand-green text-white text-[10px] font-bold rounded">Ver Ficha</button>
                     </div>
                 `;
                 marker.bindPopup(popupContent);
             });
         }
-
-
         function updateSubcategories(categoria) {
             const subSection = document.getElementById("subcategories-section");
             const subTitle = document.getElementById("subcategories-title");
@@ -2277,7 +2339,14 @@
                 if (t === tab) {
                     btn.className = "flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 border-b-2 border-brand-green text-brand-green font-bold text-[10px] sm:text-sm transition whitespace-nowrap";
                     panel.classList.remove("hidden");
-                    if (t === 'mapa') setTimeout(() => mapAdmin.invalidateSize(), 150);
+                    if (t === 'mapa') {
+                        renderAdminMarkers();
+                        setTimeout(() => mapAdmin.invalidateSize(), 150);
+                    } else if (t === 'expedientes') {
+                        renderExpedientesTable();
+                    } else if (t === 'estadisticas') {
+                        renderStatsCharts();
+                    }
                 } else {
                     btn.className = "flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-[10px] sm:text-sm transition whitespace-nowrap";
                     panel.classList.add("hidden");
@@ -2315,7 +2384,8 @@
             });
         }
 
-        function renderExpedientesTable(filteredData = incidencias) {
+        function renderExpedientesTable(filteredData = null) {
+            filteredData = filteredData || getFilteredIncidencias();
             const body = document.getElementById("table-expedientes-body");
             body.innerHTML = '';
 
@@ -2370,46 +2440,95 @@
             lucide.createIcons();
         }
 
-        function updateQuickStats() {
-            const pendingCritical = incidencias.filter(i => (i.estado === 'Pendiente' && i.prioridad === 'Crítica') || i.estado === 'Pendiente').length;
-            const inProgress = incidencias.filter(i => i.estado === 'En gestión' || i.estado === 'Derivada').length;
-            const resolved = incidencias.filter(i => i.estado === 'Resuelta' || i.estado === 'Cerrada').length;
-            const total = incidencias.length;
+        function updateQuickStats(filteredData = null) {
+            const data = filteredData || getFilteredIncidencias();
+
+            const pendingCritical = data.filter(i => i.estado === 'Pendiente').length;
+            const inProgress = data.filter(i => i.estado === 'En gestión' || i.estado === 'Derivada').length;
+            const resolved = data.filter(i => i.estado === 'Resuelta' || i.estado === 'Cerrada').length;
+            const total = data.length;
 
             document.getElementById("stat-pending-critical").innerText = pendingCritical;
             document.getElementById("stat-in-progress").innerText = inProgress;
             document.getElementById("stat-resolved").innerText = resolved;
             document.getElementById("stat-total").innerText = total;
         }
+        function normalizarFechaFiltro(fecha) {
+            if (!fecha) return "";
+            const value = String(fecha).trim();
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+
+            const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (match) {
+                return `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}`;
+            }
+
+            const parsed = new Date(value);
+            if (isNaN(parsed.getTime())) return "";
+
+            const y = parsed.getFullYear();
+            const m = String(parsed.getMonth() + 1).padStart(2, "0");
+            const d = String(parsed.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+        }
+
+        function getFilteredIncidencias() {
+            const searchEl = document.getElementById("filter-search");
+            if (!searchEl) return incidencias;
+
+            const search = searchEl.value.trim().toLowerCase();
+            const categoria = document.getElementById("filter-category").value;
+            const estado = document.getElementById("filter-status").value;
+            const prioridad = document.getElementById("filter-priority").value;
+            const fechaDesde = document.getElementById("filter-date-from").value;
+            const fechaHasta = document.getElementById("filter-date-to").value;
+
+            return incidencias.filter(inc => {
+                const texto = [
+                    inc.id,
+                    inc.direccion,
+                    inc.comentario,
+                    inc.subcategoria
+                ].map(v => String(v || "").toLowerCase()).join(" ");
+
+                const fechaInc = normalizarFechaFiltro(inc.fecha);
+
+                return (!search || texto.includes(search)) &&
+                       (categoria === "Todos" || inc.categoria === categoria) &&
+                       (estado === "Todos" || inc.estado === estado) &&
+                       (prioridad === "Todos" || inc.prioridad === prioridad) &&
+                       (!fechaDesde || (fechaInc && fechaInc >= fechaDesde)) &&
+                       (!fechaHasta || (fechaInc && fechaInc <= fechaHasta));
+            });
+        }
 
         function applyFilters() {
-            const search = document.getElementById("filter-search").value.toLowerCase();
-            const cat = document.getElementById("filter-category").value;
-            const status = document.getElementById("filter-status").value;
-            const priority = document.getElementById("filter-priority").value;
+            const filtered = getFilteredIncidencias();
 
-            const filtered = incidencias.filter(inc => {
-                const matchesSearch = inc.direccion.toLowerCase().includes(search) ||
-                                      inc.id.toLowerCase().includes(search) ||
-                                      inc.comentario.toLowerCase().includes(search);
-                const matchesCat = (cat === 'Todos') || (inc.categoria === cat);
-                const matchesStatus = (status === 'Todos') || (inc.estado === status);
-                const matchesPriority = (priority === 'Todos') || (inc.prioridad === priority);
-
-                return matchesSearch && matchesCat && matchesStatus && matchesPriority;
-            });
+            const count = document.getElementById("filter-result-count");
+            if (count) {
+                count.innerText = `${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"}`;
+            }
 
             renderExpedientesTable(filtered);
+            renderAdminMarkers(filtered);
+            renderStatsCharts(filtered);
+            updateQuickStats(filtered);
         }
-
         function resetFilters() {
-            document.getElementById("filter-search").value = '';
-            document.getElementById("filter-category").value = 'Todos';
-            document.getElementById("filter-status").value = 'Todos';
-            document.getElementById("filter-priority").value = 'Todos';
-            renderExpedientesTable();
-        }
+            document.getElementById("filter-search").value = "";
+            document.getElementById("filter-category").value = "Todos";
+            document.getElementById("filter-status").value = "Todos";
+            document.getElementById("filter-priority").value = "Todos";
+            const hoy = new Date();
+            const dosMesesAtras = new Date(hoy);
+            dosMesesAtras.setMonth(dosMesesAtras.getMonth() - 2);
 
+            document.getElementById("filter-date-from").value = dosMesesAtras.toISOString().split('T')[0];
+            document.getElementById("filter-date-to").value = hoy.toISOString().split('T')[0];
+            applyFilters();
+        }
         function openFicha(id) {
             const inc = incidencias.find(i => i.id === id);
             if (!inc) return;
@@ -2432,6 +2551,7 @@
             renderFichaActuaciones(inc.actuaciones);
 
             document.getElementById("modal-ficha").classList.remove("hidden");
+            setFichaOriginalState();
             lucide.createIcons();
         }
 
@@ -2439,6 +2559,7 @@
             document.getElementById("modal-ficha").classList.add("hidden");
             document.getElementById("form-actuacion-container").classList.add("hidden");
             activeFichaId = null;
+            fichaOriginalState = null;
         }
 
         function renderFichaActuaciones(actuaciones) {
@@ -2552,8 +2673,17 @@
             const inc = incidencias.find(i => i.id === activeFichaId);
             if (!inc) return;
 
+            const actual = getFichaCurrentState();
+            const hayCambios = fichaOriginalState && (
+                actual.estado !== fichaOriginalState.estado ||
+                actual.prioridad !== fichaOriginalState.prioridad ||
+                actual.observaciones !== fichaOriginalState.observaciones
+            );
+            if (!hayCambios) return;
+
             const usuarioActivo = getCurrentUsername();
             if (!usuarioActivo) {
+                setFichaOriginalState();
                 showAlert("No se pudo identificar al usuario autenticado. Cierre sesión e ingrese nuevamente.", "error");
                 return;
             }
@@ -2616,15 +2746,6 @@
             window.print();
         }
 
-        function triggerRiskReplanning() {
-            showConfirm(
-                "¿Replantear Mapa de Riesgo?",
-                "¿Desea iniciar el proceso de replanteo del Mapa Comunitario de Riesgo Hídrico? Esto consolidará todas las fichas hídricas activas para elevarlas al Municipio de Santa Fe.",
-                function() {
-                    showAlert("¡Excelente! Se ha generado el informe de consolidación hídrica listo para ser elevado al Municipio de Santa Fe.", "success");
-                }
-            );
-        }
 
         function showConfirm(title, message, onYes) {
             const modal = document.getElementById("modal-confirm");
@@ -2753,23 +2874,52 @@
         }
 
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,";
+            const data = getFilteredIncidencias();
+
+            if (data.length === 0) {
+                showAlert("No hay registros dentro del filtro actual para exportar.", "error");
+                return;
+            }
+
+            const escaparCSV = (valor) =>
+                `"${String(valor ?? "").replace(/"/g, '""')}"`;
+
+            let csvContent = "\uFEFF";
             csvContent += "ID,Fecha,Direccion,Coordenadas,Categoria,Subcategoria,Prioridad,Estado\n";
 
-            incidencias.forEach(i => {
-                const latFormatted = i.lat.toFixed(7);
-                const lngFormatted = i.lng.toFixed(7);
-                const row = `"${i.id}","${i.fecha}","${i.direccion}","${latFormatted}, ${lngFormatted}","${i.categoria}","${i.subcategoria}","${i.prioridad}","${i.estado}"`;
+            data.forEach(i => {
+                const lat = Number(i.lat);
+                const lng = Number(i.lng);
+                const coordenadas =
+                    Number.isFinite(lat) && Number.isFinite(lng)
+                        ? `${lat.toFixed(7)}, ${lng.toFixed(7)}`
+                        : "";
+
+                const row = [
+                    i.id,
+                    i.fecha,
+                    i.direccion,
+                    coordenadas,
+                    i.categoria,
+                    i.subcategoria,
+                    i.prioridad,
+                    i.estado
+                ].map(escaparCSV).join(",");
+
                 csvContent += row + "\n";
             });
 
-            const encodedUri = encodeURI(csvContent);
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "SGIC_Rincon_Norte_Incidencias.csv");
+            link.href = url;
+            link.download = "SGIC_Rincon_Norte_Incidencias_Filtradas.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showAlert(`CSV exportado con ${data.length} registro${data.length === 1 ? "" : "s"} filtrado${data.length === 1 ? "" : "s"}.`, "success");
         }
 
         function exportJSON() {
@@ -2786,11 +2936,12 @@
         let chartEstadosInstance = null;
         let chartTemporalInstance = null;
 
-        function renderStatsCharts() {
+        function renderStatsCharts(filteredData = null) {
+            const data = filteredData || getFilteredIncidencias();
             const catCounts = { Infraestructura: 0, Escurrimiento: 0, Circulación: 0, Mantenimiento: 0 };
             const estCounts = { Pendiente: 0, Verificada: 0, 'En gestión': 0, Derivada: 0, Resuelta: 0, Cerrada: 0, Descartada: 0 };
 
-            incidencias.forEach(i => {
+            data.forEach(i => {
                 if (catCounts[i.categoria] !== undefined) catCounts[i.categoria]++;
                 if (estCounts[i.estado] !== undefined) estCounts[i.estado]++;
             });
@@ -2851,7 +3002,7 @@
                         labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
                         datasets: [{
                             label: 'Reportes Registrados',
-                            data: [0, 0, 0, 0, 0, 0, incidencias.length],
+                            data: [0, 0, 0, 0, 0, 0, data.length],
                             borderColor: '#2e9d36',
                             backgroundColor: 'rgba(46, 157, 54, 0.1)',
                             fill: true,
