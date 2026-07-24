@@ -1689,13 +1689,14 @@
             setTimeout(() => obtenerUbicacionUsuario(true), 700);
         };
 
-        function loadIntroTextUI() {
+        function loadIntroTextUI(tituloFuente = null, textoFuente = null) {
             const container = document.getElementById("intro-text-container");
+
             const tituloGuardado = localStorage.getItem("SGIC_intro_titulo");
             const textoGuardado = localStorage.getItem("SGIC_intro_texto");
 
-            const titulo = tituloGuardado || DEFAULT_TITULO;
-            const texto = textoGuardado || DEFAULT_TEXTO;
+            const titulo = (tituloFuente || tituloGuardado || DEFAULT_TITULO).trim();
+            const texto = (textoFuente || textoGuardado || DEFAULT_TEXTO).trim();
 
             const parrafos = texto.split('\n').filter(p => p.trim() !== '');
 
@@ -1707,9 +1708,10 @@
             container.innerHTML = html;
         }
 
-        function saveIntroText() {
+        async function saveIntroText() {
             const nuevoTitulo = document.getElementById("config-intro-titulo").value.trim();
             const nuevoTexto = document.getElementById("config-intro-texto").value.trim();
+            const usuario = getCurrentUsername();
 
             if (!nuevoTitulo) {
                 showAlert("Por favor, ingrese un título para la sección.", "error");
@@ -1721,11 +1723,50 @@
                 return;
             }
 
-            localStorage.setItem("SGIC_intro_titulo", nuevoTitulo);
-            localStorage.setItem("SGIC_intro_texto", nuevoTexto);
+            if (!usuario) {
+                showAlert("No se pudo identificar al usuario administrador.", "error");
+                return;
+            }
 
-            loadIntroTextUI();
-            showAlert("¡El título y texto de presentación se actualizaron correctamente!", "success");
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "updateReferences",
+                        titulo: nuevoTitulo,
+                        descripcion: nuevoTexto,
+                        usuario: usuario
+                    })
+                });
+
+                const data = JSON.parse(await response.text());
+
+                if (data.status !== "success") {
+                    throw new Error(data.message || "No se pudieron actualizar las referencias.");
+                }
+
+                // Caché local únicamente para una carga inicial más rápida/offline.
+                localStorage.setItem("SGIC_intro_titulo", data.titulo || nuevoTitulo);
+                localStorage.setItem("SGIC_intro_texto", data.descripcion || nuevoTexto);
+
+                loadIntroTextUI(
+                    data.titulo || nuevoTitulo,
+                    data.descripcion || nuevoTexto
+                );
+
+                showAlert(
+                    "El título y la descripción se actualizaron correctamente en la hoja Referencias.",
+                    "success"
+                );
+
+            } catch (error) {
+                console.error("Error al actualizar Referencias:", error);
+                showAlert(
+                    `No se pudieron guardar los cambios: ${error.message}`,
+                    "error"
+                );
+            }
         }
 
         function openConfigEspecial() {
@@ -3037,6 +3078,25 @@
                         return marcaBorrado !== "borrado";
                     });
                     localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias)); // Actualizamos caché
+
+                    // Título y descripción centralizados en la hoja "Referencias":
+                    // A2 = título / B2 = descripción.
+                    if (data.referencias) {
+                        const tituloReferencia = String(data.referencias.titulo || "").trim();
+                        const descripcionReferencia = String(data.referencias.descripcion || "").trim();
+
+                        if (tituloReferencia) {
+                            localStorage.setItem("SGIC_intro_titulo", tituloReferencia);
+                        }
+                        if (descripcionReferencia) {
+                            localStorage.setItem("SGIC_intro_texto", descripcionReferencia);
+                        }
+
+                        loadIntroTextUI(
+                            tituloReferencia || DEFAULT_TITULO,
+                            descripcionReferencia || DEFAULT_TEXTO
+                        );
+                    }
 
                     // Refrescamos toda la interfaz del administrador y vecinos
                     renderRecentVecinoList();
