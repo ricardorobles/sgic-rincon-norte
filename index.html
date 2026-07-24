@@ -686,23 +686,35 @@
 
 
             <!-- FILTROS GLOBALES DEL PANEL ADMIN -->
-            <div class="bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-stone-200/60 no-print">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                    <div>
+            <div id="global-filters-panel" class="bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-stone-200/60 no-print">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0">
                         <h3 class="text-xs sm:text-sm font-bold text-brand-brown-dark flex items-center gap-2">
                             <i data-lucide="filter" class="w-4 h-4 text-brand-green"></i>
                             Filtros generales
                         </h3>
-                        <p class="text-[9px] sm:text-[10px] text-stone-500 mt-0.5">
+                        <p id="global-filters-description" class="hidden text-[9px] sm:text-[10px] text-stone-500 mt-0.5">
                             Se aplican al mapa, la base de datos, las estadísticas y los indicadores.
                         </p>
                     </div>
-                    <span id="filter-result-count" class="px-2.5 py-1 rounded-full bg-brand-green-light text-brand-green-dark border border-brand-green/20 text-[9px] sm:text-[10px] font-bold">
-                        -- resultados
-                    </span>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span id="filter-result-count" class="px-2.5 py-1 rounded-full bg-brand-green-light text-brand-green-dark border border-brand-green/20 text-[9px] sm:text-[10px] font-bold">
+                            -- resultados
+                        </span>
+                        <button type="button"
+                                id="btn-toggle-global-filters"
+                                onclick="toggleGlobalFilters()"
+                                title="Mostrar filtros"
+                                aria-label="Mostrar filtros"
+                                aria-expanded="false"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-600 transition">
+                            <i id="global-filters-toggle-icon" data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 sm:gap-3">
+                <div id="global-filters-content" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 sm:gap-3 mt-3">
                     <div class="lg:col-span-2">
                         <label class="block text-[9px] sm:text-[11px] font-bold text-stone-500 mb-1">Buscar</label>
                         <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Dirección, código o comentario..."
@@ -794,6 +806,39 @@
                                 <span class="flex items-center gap-0.5 sm:gap-1 text-brand-green font-bold"><span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-brand-green"></span>Baja</span>
                             </div>
                         </div>
+                        <div class="bg-white rounded-xl border border-stone-200 p-3 no-print">
+                            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-2">
+                                <div class="flex gap-2">
+                                    <input type="text"
+                                           id="admin-direccion"
+                                           placeholder="Ej: Los Eucaliptos 1250, San José del Rincón"
+                                           onkeydown="if(event.key === 'Enter'){ event.preventDefault(); geocodificarDireccionAdmin(true); }"
+                                           class="flex-1 min-w-0 px-3 py-2.5 text-sm border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green/30">
+
+                                    <button type="button"
+                                            id="btn-buscar-direccion-admin"
+                                            onclick="geocodificarDireccionAdmin(true)"
+                                            class="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-brand-green text-brand-green text-xs font-bold hover:bg-brand-green/5 transition-colors whitespace-nowrap">
+                                        <i data-lucide="search" class="w-4 h-4"></i>
+                                        <span class="hidden sm:inline">Ubicar dirección</span>
+                                    </button>
+                                </div>
+
+                                <button type="button"
+                                        id="btn-mi-ubicacion-admin"
+                                        onclick="obtenerUbicacionAdmin(true)"
+                                        class="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-brand-green text-white text-xs font-bold shadow-sm hover:bg-brand-green-dark transition-colors whitespace-nowrap">
+                                    <i data-lucide="locate-fixed" class="w-4 h-4"></i>
+                                    Ubicar mi posición
+                                </button>
+                            </div>
+
+                            <p id="estado-geocodificacion-admin"
+                               class="text-[9px] sm:text-[10px] text-slate-400 mt-2">
+                                Puede buscar una dirección o centrar el mapa en su ubicación actual.
+                            </p>
+                        </div>
+
                         <div id="map-admin" class="w-full h-64 sm:h-[500px] bg-stone-100 rounded-xl border border-stone-200 overflow-hidden relative z-10"></div>
                     </div>
 
@@ -947,6 +992,13 @@
             <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-1">Teléfono de contacto *</label>
                 <input type="tel" id="request-telefono" required placeholder="Ej: 342 555 1234"
+                       class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-1">Correo electrónico *</label>
+                <input type="email" id="request-email" required placeholder="nombre@correo.com"
+                       autocomplete="email"
                        class="w-full px-3 py-2.5 text-sm border border-stone-200 rounded-lg focus:outline-none focus:border-brand-green">
             </div>
 
@@ -1194,6 +1246,7 @@
         let incidencias = [];
         let mapVecino, mapAdmin;
         let vecinoMarker, adminMarkersGroup, vecinoAccuracyCircle;
+        let adminLocationMarker, adminAccuracyCircle;
         let activeFichaId = null;
         let fichaOriginalState = null;
 
@@ -1974,6 +2027,200 @@
             renderAdminMarkers();
         }
 
+        function setEstadoGeocodificacionAdmin(texto, esError = false) {
+            const estado = document.getElementById("estado-geocodificacion-admin");
+            if (!estado) return;
+
+            estado.innerText = texto;
+            estado.classList.toggle("text-red-600", esError);
+            estado.classList.toggle("text-slate-400", !esError);
+        }
+
+        function colocarMarcadorAdmin(lat, lng) {
+            const punto = L.latLng(Number(lat), Number(lng));
+
+            const pinAdmin = L.divIcon({
+                className: 'custom-vecino-pin',
+                html: `
+                    <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#2e9d36" stroke="#1c6622" stroke-width="2"/>
+                            <circle cx="12" cy="9" r="3" fill="white" stroke="#1c6622" stroke-width="1.5"/>
+                            <circle cx="12" cy="9" r="1.5" fill="#2e9d36"/>
+                        </svg>
+                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #2e9d36; border-radius: 50%; box-shadow: 0 0 16px rgba(46, 157, 54, 0.6); animation: pulse-green 1.5s ease-in-out infinite;"></div>
+                    </div>
+                `,
+                iconSize: [38, 38],
+                iconAnchor: [19, 38],
+                popupAnchor: [0, -38]
+            });
+
+            if (adminLocationMarker) {
+                adminLocationMarker.setLatLng(punto);
+                adminLocationMarker.setIcon(pinAdmin);
+            } else {
+                adminLocationMarker = L.marker(punto, {
+                    icon: pinAdmin,
+                    interactive: false
+                }).addTo(mapAdmin);
+            }
+        }
+
+        async function geocodificarDireccionAdmin(mostrarMensajes = false) {
+            const input = document.getElementById("admin-direccion");
+            const boton = document.getElementById("btn-buscar-direccion-admin");
+            let consulta = input ? input.value.trim() : "";
+
+            if (consulta.length < 4) {
+                setEstadoGeocodificacionAdmin("Ingrese una dirección más precisa.", true);
+                if (mostrarMensajes) showAlert("Ingrese una dirección antes de ubicarla.", "error");
+                return;
+            }
+
+            if (!/rinc[oó]n|santa fe|argentina/i.test(consulta)) {
+                consulta += ", San José del Rincón, Santa Fe, Argentina";
+            }
+
+            if (boton) {
+                boton.disabled = true;
+                boton.classList.add("opacity-60", "cursor-wait");
+                boton.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i><span class="hidden sm:inline">Buscando...</span>';
+                lucide.createIcons();
+            }
+
+            setEstadoGeocodificacionAdmin("Buscando la dirección en el mapa…");
+
+            try {
+                await esperarLimiteNominatim();
+
+                const params = new URLSearchParams({
+                    q: consulta,
+                    format: "jsonv2",
+                    limit: "1",
+                    addressdetails: "1",
+                    countrycodes: "ar"
+                });
+
+                const respuesta = await fetch(`${NOMINATIM_BASE_URL}/search?${params.toString()}`, {
+                    headers: { "Accept-Language": "es-AR,es;q=0.9" }
+                });
+
+                if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+
+                const resultados = await respuesta.json();
+                if (!resultados.length) throw new Error("SIN_RESULTADOS");
+
+                const resultado = resultados[0];
+                const lat = Number(resultado.lat);
+                const lng = Number(resultado.lon);
+
+                colocarMarcadorAdmin(lat, lng);
+                mapAdmin.setView([lat, lng], 18);
+
+                setEstadoGeocodificacionAdmin(`Dirección localizada: ${resultado.display_name}`);
+                if (mostrarMensajes) showAlert("Dirección localizada en el mapa.", "success");
+
+            } catch (error) {
+                const texto = error.message === "SIN_RESULTADOS"
+                    ? "No se encontró la dirección indicada."
+                    : "No se pudo consultar el servicio de direcciones.";
+
+                setEstadoGeocodificacionAdmin(texto, true);
+                if (mostrarMensajes) showAlert(texto, "error");
+
+            } finally {
+                if (boton) {
+                    boton.disabled = false;
+                    boton.classList.remove("opacity-60", "cursor-wait");
+                    boton.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i><span class="hidden sm:inline">Ubicar dirección</span>';
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        function obtenerUbicacionAdmin(mostrarMensajes = false) {
+            const boton = document.getElementById("btn-mi-ubicacion-admin");
+
+            if (!navigator.geolocation) {
+                const texto = "Este navegador no permite obtener la ubicación.";
+                setEstadoGeocodificacionAdmin(texto, true);
+                if (mostrarMensajes) showAlert(texto, "error");
+                return;
+            }
+
+            if (boton) {
+                boton.disabled = true;
+                boton.classList.add("opacity-60", "cursor-wait");
+                boton.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Buscando ubicación…';
+                lucide.createIcons();
+            }
+
+            setEstadoGeocodificacionAdmin("Consultando la ubicación del dispositivo…");
+
+            navigator.geolocation.getCurrentPosition(
+                function(posicion) {
+                    const lat = posicion.coords.latitude;
+                    const lng = posicion.coords.longitude;
+                    const accuracy = Math.round(posicion.coords.accuracy || 0);
+
+                    colocarMarcadorAdmin(lat, lng);
+                    mapAdmin.setView([lat, lng], accuracy > 100 ? 17 : 18);
+
+                    if (adminAccuracyCircle) {
+                        mapAdmin.removeLayer(adminAccuracyCircle);
+                        adminAccuracyCircle = null;
+                    }
+
+                    if (accuracy > 0) {
+                        adminAccuracyCircle = L.circle([lat, lng], {
+                            radius: accuracy,
+                            weight: 1,
+                            opacity: 0.8,
+                            fillOpacity: 0.10
+                        }).addTo(mapAdmin);
+                    }
+
+                    setEstadoGeocodificacionAdmin(
+                        accuracy
+                            ? `Ubicación actual localizada. Precisión estimada: ±${accuracy} m.`
+                            : "Ubicación actual localizada."
+                    );
+
+                    if (mostrarMensajes) showAlert("Su ubicación fue localizada en el mapa.", "success");
+                    restaurarBotonUbicacionAdmin();
+                },
+                function(error) {
+                    const mensajes = {
+                        1: "El permiso de ubicación fue rechazado.",
+                        2: "No fue posible determinar la ubicación del dispositivo.",
+                        3: "La búsqueda de ubicación tardó demasiado."
+                    };
+
+                    const texto = mensajes[error.code] || "No se pudo obtener la ubicación.";
+                    setEstadoGeocodificacionAdmin(texto, true);
+
+                    if (mostrarMensajes) showAlert(texto, "error");
+                    restaurarBotonUbicacionAdmin();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function restaurarBotonUbicacionAdmin() {
+            const boton = document.getElementById("btn-mi-ubicacion-admin");
+            if (!boton) return;
+
+            boton.disabled = false;
+            boton.classList.remove("opacity-60", "cursor-wait");
+            boton.innerHTML = '<i data-lucide="locate-fixed" class="w-4 h-4"></i> Ubicar mi posición';
+            lucide.createIcons();
+        }
+
         function renderAdminMarkers(filteredData = null) {
             if (!adminMarkersGroup) return;
 
@@ -2288,12 +2535,19 @@
                 nombre: document.getElementById("request-nombre").value.trim(),
                 apellido: document.getElementById("request-apellido").value.trim(),
                 telefono: document.getElementById("request-telefono").value.trim(),
+                email: document.getElementById("request-email").value.trim(),
                 usuario: document.getElementById("request-usuario").value.trim(),
                 tipoSolicitado: document.getElementById("request-tipo").value
             };
 
-            if (!payload.nombre || !payload.apellido || !payload.telefono || !payload.usuario || !payload.tipoSolicitado) {
+            if (!payload.nombre || !payload.apellido || !payload.telefono || !payload.email || !payload.usuario || !payload.tipoSolicitado) {
                 showAlert("Complete todos los campos obligatorios.", "error");
+                return;
+            }
+
+            const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email);
+            if (!emailValido) {
+                showAlert("Ingrese un correo electrónico válido.", "error");
                 return;
             }
 
@@ -2317,7 +2571,7 @@
                 document.querySelector("#modal-request-access form").reset();
                 closeRequestAccessModal();
                 showAlert(
-                    "Solicitud enviada correctamente. Su acceso quedará pendiente hasta que un administrador complete la columna H de la hoja Usuarios.",
+                    "Solicitud enviada correctamente. Su acceso quedará pendiente hasta que un administrador lo notifique.",
                     "success"
                 );
 
@@ -2542,6 +2796,28 @@
                        (!fechaDesde || (fechaInc && fechaInc >= fechaDesde)) &&
                        (!fechaHasta || (fechaInc && fechaInc <= fechaHasta));
             });
+        }
+
+        function toggleGlobalFilters() {
+            const content = document.getElementById("global-filters-content");
+            const description = document.getElementById("global-filters-description");
+            const button = document.getElementById("btn-toggle-global-filters");
+
+            if (!content || !button) return;
+
+            const estaMinimizado = content.classList.contains("hidden");
+
+            content.classList.toggle("hidden", !estaMinimizado);
+            if (description) description.classList.toggle("hidden", !estaMinimizado);
+
+            button.setAttribute("aria-expanded", estaMinimizado ? "true" : "false");
+            button.setAttribute("title", estaMinimizado ? "Minimizar filtros" : "Mostrar filtros");
+            button.setAttribute("aria-label", estaMinimizado ? "Minimizar filtros" : "Mostrar filtros");
+
+            const iconName = estaMinimizado ? "chevron-up" : "chevron-down";
+            button.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i>`;
+
+            if (window.lucide) lucide.createIcons();
         }
 
         function applyFilters() {
