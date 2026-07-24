@@ -669,7 +669,7 @@
                         <i data-lucide="check-check" class="w-4 h-4 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Resueltas/Cerradas</p>
+                        <p class="text-[8px] sm:text-xs text-stone-500 font-semibold leading-tight">Resueltas/Cerradas/Descartadas</p>
                         <h4 id="stat-resolved" class="text-base sm:text-lg font-bold text-slate-900">--</h4>
                     </div>
                 </div>
@@ -2486,7 +2486,7 @@
 
             const pendingCritical = data.filter(i => i.estado === 'Pendiente').length;
             const inProgress = data.filter(i => i.estado === 'En gestión' || i.estado === 'Derivada'|| i.estado === 'Verificada').length;
-            const resolved = data.filter(i => i.estado === 'Resuelta' || i.estado === 'Cerrada').length;
+            const resolved = data.filter(i => i.estado === 'Resuelta' || i.estado === 'Cerrada' || i.estado === 'Descartada').length;
             const total = data.length;
 
             document.getElementById("stat-pending-critical").innerText = pendingCritical;
