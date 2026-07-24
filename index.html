@@ -539,7 +539,7 @@
                                     </div>
 
                                     <input type="hidden" id="vecino-foto-base64">
-                                    <p class="text-[9px] text-slate-400 mt-1">💡 Toca "Cámara" o "Galería"</p>
+                                    <p class="text-[9px] text-slate-400 mt-1">💡 Las fotos se reducen automáticamente para evitar problemas de memoria</p>
                                 </div>
                             </div>
                             <!-- ======= FIN BOTONES DE FOTOGRAFÍA ======= -->
@@ -1141,109 +1141,227 @@
         // 📸 MANEJO DE FOTOS CON COMPRESIÓN
         // ==============================================
 
-        function comprimirImagen(base64, calidad = 0.6, maxWidth = 1024, maxHeight = 1024) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = function() {
-                    let width = img.width;
-                    let height = img.height;
+        // ==============================================
+        // 📸 MANEJO DE FOTOS OPTIMIZADO PARA CELULARES
+        // ==============================================
+        //
+        // Evita convertir primero la foto original a Base64.
+        // Esa conversión duplicaba el uso de memoria y podía
+        // reiniciar la página con fotos grandes de la cámara trasera.
+        //
+        // Resultado final:
+        // - JPEG
+        // - ancho máximo aproximado: 1280 px
+        // - calidad: 0.72
+        // - normalmente unos pocos cientos de KB
 
-                    if (width > maxWidth) {
-                        height = (height * maxWidth) / width;
-                        width = maxWidth;
-                    }
-                    if (height > maxHeight) {
-                        width = (width * maxHeight) / height;
-                        height = maxHeight;
-                    }
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', calidad);
-                    resolve(dataUrl);
-                };
-                img.onerror = function() {
-                    reject(new Error('Error al cargar la imagen'));
-                };
-                img.src = base64;
-            });
-        }
+        const FOTO_MAX_WIDTH = 1280;
+        const FOTO_CALIDAD_JPEG = 0.72;
+        const FOTO_MAX_ARCHIVO_MB = 30;
 
         let fotoSeleccionada = false;
         let fotoActual = null;
+        let procesandoFoto = false;
 
-        function procesarFoto(file, fuente) {
-            if (!file) return;
+        function canvasToDataURLSeguro(canvas, calidad = FOTO_CALIDAD_JPEG) {
+            return canvas.toDataURL("image/jpeg", calidad);
+        }
 
-            if (!file.type.startsWith('image/')) {
+        async function crearBitmapOptimizado(file) {
+            // Camino preferido en navegadores modernos.
+            // Al pedir resizeWidth durante la decodificación evitamos, cuando
+            // el navegador lo soporta, mantener una copia gigante de la foto.
+            if ("createImageBitmap" in window) {
+                try {
+                    return await createImageBitmap(file, {
+                        resizeWidth: FOTO_MAX_WIDTH,
+                        resizeQuality: "medium",
+                        imageOrientation: "from-image"
+                    });
+                } catch (error) {
+                    console.warn("createImageBitmap con reducción no disponible; usando fallback.", error);
+                }
+            }
+
+            // Fallback: URL temporal (más eficiente que FileReader + Base64 original).
+            return await new Promise((resolve, reject) => {
+                const objectUrl = URL.createObjectURL(file);
+                const img = new Image();
+
+                img.onload = function() {
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(img);
+                };
+
+                img.onerror = function() {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error("No se pudo decodificar la imagen."));
+                };
+
+                img.src = objectUrl;
+            });
+        }
+
+        async function comprimirArchivoImagen(file) {
+            let fuente = null;
+
+            try {
+                fuente = await crearBitmapOptimizado(file);
+
+                let width = fuente.width || fuente.naturalWidth;
+                let height = fuente.height || fuente.naturalHeight;
+
+                if (!width || !height) {
+                    throw new Error("No se pudieron determinar las dimensiones de la foto.");
+                }
+
+                // createImageBitmap ya suele entregar una imagen reducida.
+                // En el fallback calculamos aquí el tamaño final.
+                if (width > FOTO_MAX_WIDTH) {
+                    const escala = FOTO_MAX_WIDTH / width;
+                    width = Math.round(width * escala);
+                    height = Math.round(height * escala);
+                }
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext("2d", {
+                    alpha: false,
+                    desynchronized: true
+                });
+
+                if (!ctx) {
+                    throw new Error("No fue posible preparar el procesador de imagen.");
+                }
+
+                // Fondo blanco para evitar transparencias problemáticas al pasar a JPEG.
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(fuente, 0, 0, width, height);
+
+                const dataUrl = canvasToDataURLSeguro(canvas, FOTO_CALIDAD_JPEG);
+
+                // Liberar memoria del canvas cuanto antes.
+                ctx.clearRect(0, 0, width, height);
+                canvas.width = 1;
+                canvas.height = 1;
+
+                return dataUrl;
+
+            } finally {
+                // ImageBitmap permite liberar explícitamente la memoria gráfica.
+                if (fuente && typeof fuente.close === "function") {
+                    try { fuente.close(); } catch (_) {}
+                }
+            }
+        }
+
+        async function procesarFoto(file, fuente) {
+            if (!file || procesandoFoto) return;
+
+            if (!file.type || !file.type.startsWith("image/")) {
                 showAlert("Por favor, selecciona un archivo de imagen válido.", "error");
                 return;
             }
 
+            const tamañoOriginalMB = file.size / (1024 * 1024);
+
+            // Corte preventivo para archivos excepcionalmente grandes.
+            if (tamañoOriginalMB > FOTO_MAX_ARCHIVO_MB) {
+                showAlert(
+                    `La foto pesa ${tamañoOriginalMB.toFixed(1)} MB y es demasiado grande para procesarla con seguridad en este dispositivo. Probá reduciendo la resolución de la cámara o elegí la foto desde la galería.`,
+                    "error"
+                );
+                return;
+            }
+
+            procesandoFoto = true;
+
             const statusEl = document.getElementById("foto-status");
-            if (statusEl) statusEl.innerHTML = '⏳ Comprimiendo imagen...';
+            if (statusEl) {
+                statusEl.innerHTML = `⏳ Optimizando foto de ${fuente}...`;
+            }
 
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                try {
-                    const base64Original = event.target.result;
-                    const base64Comprimido = await comprimirImagen(base64Original, 0.6, 1024, 1024);
+            try {
+                // Dar un pequeño respiro al navegador después de volver de la cámara.
+                await new Promise(resolve => setTimeout(resolve, 80));
 
-                    document.getElementById("vecino-foto-base64").value = base64Comprimido;
-                    fotoActual = base64Comprimido;
+                const base64Comprimido = await comprimirArchivoImagen(file);
 
-                    const previewContainer = document.getElementById("foto-preview-container");
-                    const previewImg = document.getElementById("foto-preview");
-                    previewImg.src = base64Comprimido;
-                    previewContainer.classList.remove("hidden");
+                const hiddenFoto = document.getElementById("vecino-foto-base64");
+                const previewContainer = document.getElementById("foto-preview-container");
+                const previewImg = document.getElementById("foto-preview");
 
-                    if (statusEl) statusEl.innerHTML = '✅ Foto cargada';
+                // Soltar la foto anterior antes de asignar la nueva.
+                if (previewImg) previewImg.src = "";
+                fotoActual = null;
 
-                    const tamañoKB = Math.round(base64Comprimido.length * 3 / 4 / 1024);
-                    const tamañoMB = (tamañoKB / 1024).toFixed(1);
+                hiddenFoto.value = base64Comprimido;
+                fotoActual = base64Comprimido;
 
-                    showAlert(`✅ ¡Foto cargada! (${tamañoMB} MB comprimida)`, "success");
+                previewImg.src = base64Comprimido;
+                previewContainer.classList.remove("hidden");
 
-                    const btn = document.querySelector('.foto-btn');
-                    if (btn) {
-                        btn.classList.add('ring-4', 'ring-brand-green/30');
-                        setTimeout(() => {
-                            btn.classList.remove('ring-4', 'ring-brand-green/30');
-                        }, 1500);
-                    }
+                fotoSeleccionada = true;
 
-                    fotoSeleccionada = true;
+                if (statusEl) statusEl.innerHTML = "✅ Foto optimizada y lista";
 
-                } catch (error) {
-                    console.error("Error al procesar la imagen:", error);
-                    showAlert("Error al procesar la imagen. Intente con otra.", "error");
-                    if (statusEl) statusEl.innerHTML = '📷 Tomar foto o subir imagen';
-                }
-            };
+                const tamañoFinalKB = Math.round(base64Comprimido.length * 3 / 4 / 1024);
 
-            reader.onerror = function() {
-                showAlert("Error al leer la imagen. Intente nuevamente.", "error");
-                const statusEl = document.getElementById("foto-status");
-                if (statusEl) statusEl.innerHTML = '📷 Tomar foto o subir imagen';
-            };
+                showAlert(
+                    `✅ Foto lista: ${tamañoOriginalMB.toFixed(1)} MB → ${tamañoFinalKB} KB`,
+                    "success"
+                );
 
-            reader.readAsDataURL(file);
+                const botones = document.querySelectorAll(".foto-btn");
+                botones.forEach(btn => btn.classList.add("ring-4", "ring-brand-green/30"));
+
+                setTimeout(() => {
+                    botones.forEach(btn => btn.classList.remove("ring-4", "ring-brand-green/30"));
+                }, 1200);
+
+            } catch (error) {
+                console.error("Error al procesar la imagen:", error);
+
+                document.getElementById("vecino-foto-base64").value = "";
+                fotoActual = null;
+                fotoSeleccionada = false;
+
+                showAlert(
+                    "No se pudo procesar la foto. El dispositivo puede haberse quedado sin memoria. Probá nuevamente o elegí la imagen desde la galería.",
+                    "error"
+                );
+
+                if (statusEl) statusEl.innerHTML = "📷 Tomar foto o subir imagen";
+
+            } finally {
+                procesandoFoto = false;
+            }
         }
 
-        function handleImageUploadCamara(e) {
-            const file = e.target.files[0];
-            procesarFoto(file, "cámara");
-            e.target.value = '';
+        async function handleImageUploadCamara(e) {
+            const input = e.target;
+            const file = input.files && input.files[0];
+
+            try {
+                await procesarFoto(file, "cámara");
+            } finally {
+                // Liberar la referencia al archivo original una vez procesado.
+                input.value = "";
+            }
         }
 
-        function handleImageUploadGaleria(e) {
-            const file = e.target.files[0];
-            procesarFoto(file, "galería");
-            e.target.value = '';
+        async function handleImageUploadGaleria(e) {
+            const input = e.target;
+            const file = input.files && input.files[0];
+
+            try {
+                await procesarFoto(file, "galería");
+            } finally {
+                input.value = "";
+            }
         }
 
         function eliminarFoto() {
