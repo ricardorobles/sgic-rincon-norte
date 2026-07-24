@@ -924,7 +924,7 @@
                 <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="text-center sm:text-left">
                         <p class="text-[10px] sm:text-[11px] font-bold text-rose-900">Restablecer Base de Datos</p>
-                        <p class="text-[8px] sm:text-[10px] text-rose-700">Borra todas las incidencias cargadas permanentemente.</p>
+                        <p class="text-[8px] sm:text-[10px] text-rose-700">Da de baja todas las incidencias en sistema sin eliminar la base de datos.</p>
                     </div>
                     <button onclick="confirmClearAllData()" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow shrink-0 min-h-[42px]">
                         Borrar Todo
@@ -1664,8 +1664,8 @@
 
         function confirmClearAllData() {
             showConfirm(
-                "¿RESTABLECER TODO EL SISTEMA?",
-                "Esta acción borrará permanentemente todas las incidencias y actuaciones registradas en este dispositivo.",
+                "¿DAR DE BAJA TODAS LAS INCIDENCIAS?",
+                'Esta acción marcará como "borrado" todas las incidencias activas en la columna O de Google Sheets. Los registros no se eliminarán físicamente, pero dejarán de mostrarse en el sistema.',
                 function() {
                     executeClearAllData();
                 }
@@ -1673,16 +1673,52 @@
         }
 
         function executeClearAllData() {
-            incidencias = [];
-            localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
-            closeConfigEspecial();
-            showAlert("La base de datos de Rincón Norte ha sido vaciada por completo.", "success");
+            showAlert("⏳ Dando de baja todas las incidencias...", "success");
 
-            renderRecentVecinoList();
-            renderExpedientesTable();
-            renderAdminMarkers();
-            renderStatsCharts();
-            updateQuickStats();
+            fetch(webAppUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "deleteAll"
+                })
+            })
+            .then(response => response.text())
+            .then(text => {
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error("El servidor no devolvió una respuesta JSON válida.");
+                }
+
+                if (data.status !== "success") {
+                    throw new Error(data.message || "No se pudieron dar de baja las incidencias.");
+                }
+
+                // Limpiamos únicamente las vistas locales.
+                // Las filas permanecen en Google Sheets marcadas como "borrado".
+                incidencias = [];
+                localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
+
+                closeConfigEspecial();
+
+                const cantidad = Number(data.count || 0);
+                showAlert(
+                    `✅ Se dieron de baja ${cantidad} incidencia${cantidad === 1 ? "" : "s"}. Los registros permanecen en Google Sheets marcados como "borrado".`,
+                    "success"
+                );
+
+                renderRecentVecinoList();
+                renderExpedientesTable();
+                renderAdminMarkers();
+                renderStatsCharts();
+                updateQuickStats();
+            })
+            .catch(error => {
+                console.error("Error al dar de baja todas las incidencias:", error);
+                showAlert(`⚠️ No se pudo completar la baja masiva: ${error.message}`, "error");
+            });
         }
 
         // ==============================================
@@ -2411,7 +2447,7 @@
         function confirmDeleteFicha() {
             showConfirm(
                 "¿Dar de baja incidencia?",
-                `Esta acción eliminará el expediente ${activeFichaId} de forma permanente e irreversible.`,
+                `El expediente ${activeFichaId} será marcado como "borrado" en la base de datos y dejará de mostrarse en el sistema.`,
                 function() {
                     deleteFicha(activeFichaId);
                 }
@@ -2419,15 +2455,50 @@
         }
 
         function deleteFicha(id) {
-            incidencias = incidencias.filter(i => i.id !== id);
-            localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
-            closeModal();
-            showAlert(`Se ha dado de baja permanentemente el reporte ${id}.`, "success");
-            renderRecentVecinoList();
-            renderExpedientesTable();
-            renderAdminMarkers();
-            renderStatsCharts();
-            updateQuickStats();
+            showAlert(`⏳ Dando de baja el expediente ${id}...`, "success");
+
+            const payload = {
+                action: "delete",
+                id: id,
+                borrado: "borrado"
+            };
+
+            fetch(webAppUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.text())
+            .then(text => {
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error("El servidor no devolvió una respuesta JSON válida.");
+                }
+
+                if (data.status !== "success") {
+                    throw new Error(data.message || "No se pudo dar de baja el expediente.");
+                }
+
+                // Se elimina solamente de la vista local.
+                // En Google Sheets el registro permanece y la columna O queda marcada como "borrado".
+                incidencias = incidencias.filter(i => i.id !== id);
+                localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias));
+
+                closeModal();
+                showAlert(`✅ El expediente ${id} fue dado de baja. El registro permanece en Google Sheets marcado como "borrado".`, "success");
+
+                renderRecentVecinoList();
+                renderExpedientesTable();
+                renderAdminMarkers();
+                renderStatsCharts();
+                updateQuickStats();
+            })
+            .catch(error => {
+                console.error("Error al dar de baja:", error);
+                showAlert(`⚠️ No se pudo dar de baja el expediente ${id}: ${error.message}`, "error");
+            });
         }
 
         function exportExcel() {
@@ -2605,7 +2676,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    incidencias = data.data; // Reemplazamos la base local con la de la nube
+                    // Los registros marcados como "borrado" en la columna O permanecen
+                    // en Google Sheets, pero se excluyen de todas las vistas del sistema.
+                    incidencias = (data.data || []).filter(inc => {
+                        const marcaBorrado = String(
+                            inc.borrado ?? inc.Borrado ?? inc.eliminado ?? inc.Eliminado ?? ""
+                        ).trim().toLowerCase();
+
+                        return marcaBorrado !== "borrado";
+                    });
                     localStorage.setItem("SGIC_incidencias", JSON.stringify(incidencias)); // Actualizamos caché
 
                     // Refrescamos toda la interfaz del administrador y vecinos
