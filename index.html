@@ -1194,8 +1194,12 @@
         let vecinoMarker, adminMarkersGroup, vecinoAccuracyCircle;
         let activeFichaId = null;
 
-        let currentAccessType = null;   // "ADMIN" | "VECINAL" | null
-        let currentUsername = null;
+        let currentAccessType = sessionStorage.getItem("SGIC_access_type") || null;
+        let currentUsername = sessionStorage.getItem("SGIC_username") || null;
+
+        function getCurrentUsername() {
+            return (currentUsername || sessionStorage.getItem("SGIC_username") || "").trim();
+        }
 
         const DEFAULT_TITULO = "Registro Barrial de Problemas Hídricos ";
         const DEFAULT_TEXTO = "Esta aplicación permite registrar y localizar en un mapa los problemas que afectan la infraestructura hídrica y vial de Rincón Norte.\nDurante el registro se solicitará la ubicación del problema, una breve descripción, fotografías (si las hubiera) y otros datos que ayuden a identificar la situación con precisión.\nLa información aportada por los vecinos conforma una base de datos georreferenciada que permite realizar el seguimiento de cada caso, elaborar el Mapa Comunitario de Riesgo Hídrico de Rincón Norte y respaldar los reclamos e informes presentados ante los organismos competentes.\nCada registro contribuye a conocer la problemática barrial, a construir un diagnóstico preciso y a fortalecer las gestiones para mejorar su infraestructura.";
@@ -1735,7 +1739,7 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({
                     action: "deleteAll",
-                    usuario: currentUsername || ""
+                    usuario: getCurrentUsername()
                 })
             })
             .then(response => response.text())
@@ -2140,11 +2144,16 @@
                 }
 
                 currentAccessType = String(data.accessType || "").trim().toUpperCase();
-                currentUsername = data.usuario || usuario;
+                currentUsername = String(data.usuario || usuario).trim();
+
+                sessionStorage.setItem("SGIC_access_type", currentAccessType);
+                sessionStorage.setItem("SGIC_username", currentUsername);
 
                 if (!["ADMIN", "VECINAL"].includes(currentAccessType)) {
                     currentAccessType = null;
                     currentUsername = null;
+                    sessionStorage.removeItem("SGIC_access_type");
+                    sessionStorage.removeItem("SGIC_username");
                     throw new Error("El usuario todavía no tiene un tipo de acceso habilitado.");
                 }
 
@@ -2159,6 +2168,8 @@
             } catch (error) {
                 currentAccessType = null;
                 currentUsername = null;
+                sessionStorage.removeItem("SGIC_access_type");
+                sessionStorage.removeItem("SGIC_username");
                 showAlert(error.message || "Usuario o contraseña incorrectos.", "error");
             } finally {
                 btn.disabled = false;
@@ -2252,6 +2263,8 @@
                 sectionAdmin.classList.add("hidden");
                 currentAccessType = null;
                 currentUsername = null;
+                sessionStorage.removeItem("SGIC_access_type");
+                sessionStorage.removeItem("SGIC_username");
                 setTimeout(() => mapVecino.invalidateSize(), 150);
             }
         }
@@ -2462,6 +2475,12 @@
         }
 
         function addActuacion() {
+            const usuarioActivo = getCurrentUsername();
+            if (!usuarioActivo) {
+                showAlert("No se pudo identificar al usuario autenticado. Cierre sesión e ingrese nuevamente.", "error");
+                return;
+            }
+
             const accion = document.getElementById("actuacion-accion").value;
             const autor = document.getElementById("actuacion-autor").value;
             const detalles = document.getElementById("actuacion-detalles").value;
@@ -2494,7 +2513,7 @@
                 detalles: nuevaAct.detalles,
                 prioridad: inc.prioridad || "",
                 estado: inc.estado || "",
-                usuario: currentUsername || ""
+                usuario: getCurrentUsername()
             };
 
             fetch(webAppUrl, {
@@ -2533,6 +2552,12 @@
             const inc = incidencias.find(i => i.id === activeFichaId);
             if (!inc) return;
 
+            const usuarioActivo = getCurrentUsername();
+            if (!usuarioActivo) {
+                showAlert("No se pudo identificar al usuario autenticado. Cierre sesión e ingrese nuevamente.", "error");
+                return;
+            }
+
             // Capturar los nuevos valores del panel de administración
             inc.estado = document.getElementById("ficha-select-estado").value;
             inc.prioridad = document.getElementById("ficha-select-prioridad").value;
@@ -2550,7 +2575,7 @@
                 estado: inc.estado,
                 prioridad: inc.prioridad,
                 observaciones: inc.observaciones,
-                usuario: currentUsername || ""
+                usuario: getCurrentUsername()
             };
 
             fetch(webAppUrl, {
@@ -2635,7 +2660,7 @@
                 action: "delete",
                 id: id,
                 borrado: "borrado",
-                usuario: currentUsername || ""
+                usuario: getCurrentUsername()
             };
 
             fetch(webAppUrl, {
